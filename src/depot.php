@@ -18,18 +18,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// 🔹 Récupération des données
+//  Récupération des données
 $montant = isset($_POST['amount']) ? floatval($_POST['amount']) : null;
 $reference = isset($_POST['reference']) ? trim($_POST['reference']) : '';
 $preuve_image = '';
 
-// 🔹 Validation des données
+//  Validation des données
 if (!$montant || $montant <= 0 || empty($reference)) {
     echo json_encode(['success' => false, 'message' => 'Montant ou référence invalide.']);
     exit;
 }
 
-// 🔹 Vérification de la référence
+//  Vérification de la référence
 $stmt = $pdo->prepare("SELECT COUNT(*) FROM depots WHERE reference = ?");
 $stmt->execute([$reference]);
 if ($stmt->fetchColumn() > 0) {
@@ -37,9 +37,15 @@ if ($stmt->fetchColumn() > 0) {
     exit;
 }
 
-// 🔹 Upload de la preuve
+// Vérification de l'image
+if (empty($_FILES['proof']) || $_FILES['proof']['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(['success' => false, 'message' => 'La preuve de dépôt (image) est obligatoire.']);
+    exit;
+}
+
+//  Upload de la preuve
 if (!empty($_FILES['proof']) && $_FILES['proof']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/../uploads/';
+    $uploadDir = __DIR__ . '/../assets/uploads/';
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
@@ -63,7 +69,7 @@ if (!empty($_FILES['proof']) && $_FILES['proof']['error'] === UPLOAD_ERR_OK) {
     }
 }
 
-// 🔹 Enregistrement du dépôt
+//  Enregistrement du dépôt
 $stmt = $pdo->prepare("
     INSERT INTO depots (utilisateur_id, montant, reference, preuve_image, statut, date_depot)
     VALUES (?, ?, ?, ?, ?, NOW())

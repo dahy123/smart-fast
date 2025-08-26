@@ -16,7 +16,7 @@ function normalize_phone($telephone) {
     return $telephone;
 }
 
-// 🔹 Vérification de la méthode
+// // 🔹 Vérification de la méthode
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Méthode non autorisée.']);
     exit;
@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // 🔹 Récupération des données
 $telephone = normalize_phone(trim($_POST['telephone'] ?? ''));
 $mot_de_passe = $_POST['mot_de_passe'] ?? '';
+
 
 // 🔹 Validation des champs
 if (!$telephone || !$mot_de_passe) {

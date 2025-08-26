@@ -2,8 +2,8 @@
 class Database
 {
     // Configuration
-    private static $host = "127.0.0.1";
-    private static $db = "smart_mg";
+    private static $host = "localhost";
+    private static $db = "smart_fast";
     private static $user = "smart";
     private static $password = "1234";
 
@@ -137,7 +137,7 @@ class Database
     {
         $stmt = $pdo->query("SELECT COUNT(*) FROM utilisateurs WHERE telephone = '0329375154'");
         if ($stmt->fetchColumn() == 0) {
-            $hash = password_hash('Rdo$2005', PASSWORD_DEFAULT);
+            $hash = password_hash('1234', PASSWORD_DEFAULT);
             $stmtInsert = $pdo->prepare("INSERT INTO utilisateurs (nom, prenom, telephone, mot_de_passe, role)
                                          VALUES ('Dahy', 'Oldon', '0329375154', :hash, :role)");
             $stmtInsert->execute(['hash' => $hash, 'role' => self::ROLE_ADMIN]);

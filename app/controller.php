@@ -20,6 +20,7 @@ if ($pdo) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $user_fullname = $user['prenom'] . ' ' . $user['nom'];
+    $initiale=strtoupper(substr($user['prenom'],0,1));
     $user_phone = $user['telephone'];
     $user_creation_date = $user['date_inscription'];
 
@@ -29,7 +30,7 @@ if ($pdo) {
     $balance = $stmt->fetchColumn();
 
     // Dépôts récents (2 derniers)
-    $stmt = $pdo->prepare("SELECT id, montant, preuve_image, statut, date_depot FROM depots WHERE utilisateur_id = ? ORDER BY date_depot DESC LIMIT 2");
+    $stmt = $pdo->prepare("SELECT id, montant, preuve_image, statut, date_depot FROM depots WHERE utilisateur_id = ? ORDER BY date_depot DESC LIMIT 3");
     $stmt->execute([$user_id]);
     $depots_recents = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -61,12 +62,28 @@ if ($pdo) {
                        ORDER BY date_retrait DESC");
     $stmt->execute([$user_id]);
     $retraits_hist = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   
+   // Récupérer le niveau actuel de l'utilisateur (niveau 0 par défaut)
+$stmt = $pdo->prepare("SELECT MAX(niveau_id) FROM investissements WHERE utilisateur_id = ?");
+$stmt->execute([$user_id]);
+$niveau_actuel = (int) $stmt->fetchColumn();
+if ($niveau_actuel === 0) $niveau_actuel = 0;
 
-    // Niveau actuel de l'utilisateur
-    $stmt = $pdo->prepare("SELECT MAX(niveau_id) FROM investissements WHERE utilisateur_id = ?");
-    $stmt->execute([$user_id]);
-    $niveau_actuel = (int) $stmt->fetchColumn();
-    // if ($niveau_actuel === 0) ; // Par défaut niveau 1
+// Récupérer le solde utilisateur (ex: somme des investissements ou autre logique)
+$stmt = $pdo->prepare("SELECT SUM(montant) FROM investissements WHERE utilisateur_id = ?");
+$stmt->execute([$user_id]);
+$solde_user = (float) $stmt->fetchColumn();
+if (!$solde_user) $solde_user = 0;
+
+// Récupérer le prochain niveau pour le calcul de progression
+$stmt = $pdo->prepare("SELECT * FROM niveaux WHERE niveau > ? ORDER BY niveau ASC LIMIT 1");
+$stmt->execute([$niveau_actuel]);
+$prochain_niveau = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Calcul de la progression en pourcentage
+$next_price = $prochain_niveau ? (float) $prochain_niveau['investissement'] : 1;
+$progress = min(100, ($solde_user / $next_price) * 100);
+$restant = $prochain_niveau ? max(0, $next_price - $solde_user) : 0;
 
     // Récupérer les niveaux à parcourir (supérieurs au niveau actuel)
     $stmt = $pdo->prepare("SELECT * FROM niveaux WHERE niveau > ? ORDER BY niveau ASC");
