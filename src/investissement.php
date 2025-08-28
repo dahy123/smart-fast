@@ -12,9 +12,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $data = json_decode(file_get_contents('php://input'), true);
 $niveau = (int) ($data['niveau'] ?? 0);
-$montant = (float) ($data['montant'] ?? 0);
 
-if ($niveau <= 0 || $montant <= 0) {
+if ($niveau <= 0) {
     echo json_encode(['success' => false, 'message' => 'Données invalides.']);
     exit;
 }
@@ -22,6 +21,11 @@ if ($niveau <= 0 || $montant <= 0) {
 $pdo = Database::pdo();
 $user_id = $_SESSION['user_id'];
 $admin_id = 1;
+
+$stmt = $pdo->prepare("SELECT investissement FROM niveaux WHERE niveau = ?");
+$stmt->execute([$niveau]);
+$montant = (float) $stmt->fetchColumn();
+
 
 try {
     // 🔄 Démarrer la transaction
@@ -92,11 +96,11 @@ try {
     $stmt->execute([$user_id, $niveau, $montant]);
 
     // 🔹 Enregistrer le gain
-    $stmt = $pdo->prepare("
-        INSERT INTO gains (source_id, destinataire_id, niveau, montant, date_gain)
-        VALUES (?, ?, ?, ?, NOW())
-    ");
-    $stmt->execute([$user_id, $beneficiaire_id, $niveau, $montant]);
+    // $stmt = $pdo->prepare("
+    //     INSERT INTO gains (source_id, destinataire_id, niveau, montant, date_gain)
+    //     VALUES (?, ?, ?, ?, NOW())
+    // ");
+    // $stmt->execute([$user_id, $beneficiaire_id, $niveau, $montant]);
 
     // ✅ Valider la transaction
     $pdo->commit();

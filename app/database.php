@@ -4,7 +4,7 @@ class Database
     // Configuration
     private static $host = "localhost";
     private static $db = "smart_fast";
-    private static $user = "smart";
+    private static $user = "root";
     private static $password = "1234";
 
     // Constantes pour les rôles et statuts

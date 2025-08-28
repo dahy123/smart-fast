@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once "../app/controller.php";
 
 ?>
@@ -14,17 +14,17 @@ require_once "../app/controller.php";
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#16a34a',
-                    'primary-dark': '#15803d',
-                    'primary-light': '#22c55e'
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#16a34a',
+                        'primary-dark': '#15803d',
+                        'primary-light': '#22c55e'
+                    }
                 }
             }
         }
-    }
     </script>
 </head>
 
@@ -71,9 +71,14 @@ require_once "../app/controller.php";
                 <div class="flex items-center space-x-4">
                     <span class="text-sm text-gray-700">Bienvenue,
                         <strong><?php echo htmlspecialchars($user_fullname); ?></strong></span>
-                    <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
+                    <!-- <button type="button" id="logoutBtn"
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
                         <i class="bi bi-box-arrow-right mr-1"></i>Déconnexion
-                    </button>
+                    </button> -->
+                    <a href="logout.php"
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center">
+                        <i class="bi bi-box-arrow-right mr-1"></i>Déconnexion
+                    </a>
                 </div>
             </div>
         </div>
@@ -156,7 +161,8 @@ require_once "../app/controller.php";
                         <div class="ml-4">
                             <p class="text-gray-600 text-sm">Total Dépôts</p>
                             <p class="text-2xl font-bold text-gray-900">
-                                <?= number_format($total_depots ?? 0, 0, '', ' ') ?> Ar</p>
+                                <?= number_format($total_depots ?? 0, 0, '', ' ') ?> Ar
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -168,7 +174,8 @@ require_once "../app/controller.php";
                         <div class="ml-4">
                             <p class="text-gray-600 text-sm">Total Retraits</p>
                             <p class="text-2xl font-bold text-gray-900">
-                                <?= number_format($total_retraits ?? 0, 0, '', ' ') ?> Ar</p>
+                                <?= number_format($total_retraits ?? 0, 0, '', ' ') ?> Ar
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -180,7 +187,8 @@ require_once "../app/controller.php";
                         <div class="ml-4">
                             <p class="text-gray-600 text-sm">Investissements</p>
                             <p class="text-2xl font-bold text-gray-900">
-                                <?= number_format($total_investissements ?? 0, 0, '', ' ') ?> Ar</p>
+                                <?= number_format($total_investissements ?? 0, 0, '', ' ') ?> Ar
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -208,14 +216,15 @@ require_once "../app/controller.php";
                     </button>
                 </div>
                 <div class="mt-4">
-                    <?php 
-                $progress = $balance && $mise_a_niveau ? min(($balance / $mise_a_niveau) * 100, 100) : 0; 
-                ?>
+                    <?php
+                    $progress = $balance && $mise_a_niveau ? min(($balance / $mise_a_niveau) * 100, 100) : 0;
+                    ?>
                     <div class="bg-gray-200 rounded-full h-2">
                         <div class="bg-primary h-2 rounded-full" style="width: <?= $progress ?>%"></div>
                     </div>
                     <p class="text-xs text-gray-600 mt-1"><?= number_format($balance ?? 0, 0, '', ' ') ?> /
-                        <?= number_format($mise_a_niveau ?? 0, 0, '', ' ') ?> Ar pour le niveau suivant</p>
+                        <?= number_format($mise_a_niveau ?? 0, 0, '', ' ') ?> Ar pour le niveau suivant
+                    </p>
                 </div>
             </div>
 
@@ -227,20 +236,21 @@ require_once "../app/controller.php";
                 </div>
                 <div class="space-y-4">
                     <?php foreach ($depots_valides as $depot): ?>
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div class="flex items-center">
-                            <div class="bg-green-100 p-2 rounded-lg">
-                                <i class="bi bi-plus-circle text-primary"></i>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-green-100 p-2 rounded-lg">
+                                    <i class="bi bi-plus-circle text-primary"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="font-medium text-gray-900">Dépôt</p>
+                                    <p class="text-sm text-gray-600">
+                                        <?= date('d M, H:i', strtotime($depot['date_depot'])) ?>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="ml-3">
-                                <p class="font-medium text-gray-900">Dépôt</p>
-                                <p class="text-sm text-gray-600">
-                                    <?= date('d M, H:i', strtotime($depot['date_depot'])) ?></p>
-                            </div>
+                            <span class="font-semibold text-primary">+<?= number_format($depot['montant'], 0, '', ' ') ?>
+                                Ar</span>
                         </div>
-                        <span class="font-semibold text-primary">+<?= number_format($depot['montant'], 0, '', ' ') ?>
-                            Ar</span>
-                    </div>
                     <?php endforeach; ?>
                     <!-- On peut ajouter retraits récents de même manière -->
                 </div>
@@ -420,27 +430,27 @@ require_once "../app/controller.php";
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Historique des dépôts</h3>
                 <div class="space-y-4">
                     <?php if (!empty($depots_recents)): ?>
-                    <?php foreach ($depots_recents as $depot): ?>
-                    <?php
-                    // Déterminer style selon statut
-                    $bgClass = $depot['statut'] === 'valide' ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200';
-                    $badgeClass = $depot['statut'] === 'valide' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
-                ?>
-                    <div class="flex items-center justify-between p-4 rounded-lg border <?= $bgClass ?>">
-                        <div>
-                            <p class="font-medium text-gray-900"><?= number_format($depot['montant'], 0, ',', ' ') ?> Ar
-                            </p>
-                            <p class="text-sm text-gray-600">
-                                <?= date('d/m/Y H:i', strtotime($depot['date_depot'])) ?>
-                            </p>
-                        </div>
-                        <span class="<?= $badgeClass ?> px-3 py-1 rounded-full text-sm font-medium">
-                            <?= ucfirst($depot['statut']) ?>
-                        </span>
-                    </div>
-                    <?php endforeach; ?>
+                        <?php foreach ($depots_recents as $depot): ?>
+                            <?php
+                            // Déterminer style selon statut
+                            $bgClass = $depot['statut'] === 'valide' ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200';
+                            $badgeClass = $depot['statut'] === 'valide' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800';
+                            ?>
+                            <div class="flex items-center justify-between p-4 rounded-lg border <?= $bgClass ?>">
+                                <div>
+                                    <p class="font-medium text-gray-900"><?= number_format($depot['montant'], 0, ',', ' ') ?> Ar
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        <?= date('d/m/Y H:i', strtotime($depot['date_depot'])) ?>
+                                    </p>
+                                </div>
+                                <span class="<?= $badgeClass ?> px-3 py-1 rounded-full text-sm font-medium">
+                                    <?= ucfirst($depot['statut']) ?>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
                     <?php else: ?>
-                    <p class="text-sm text-gray-500">Aucun dépôt récent</p>
+                        <p class="text-sm text-gray-500">Aucun dépôt récent</p>
                     <?php endif; ?>
                 </div>
             </div>
@@ -448,39 +458,39 @@ require_once "../app/controller.php";
         </main>
     </div>
     <script>
-    // Soumission AJAX du formulaire
-    document.getElementById('depositForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+        // Soumission AJAX du formulaire
+        document.getElementById('depositForm').addEventListener('submit', function (e) {
+            e.preventDefault();
 
-        let formData = new FormData(this);
+            let formData = new FormData(this);
 
-        console.log(formData);
+            console.log(formData);
 
-        fetch('<?= $baseUrl ?? "" ?>depot.php', {
+            fetch('<?= $baseUrl ?? "" ?>depot.php', {
                 method: 'POST',
                 body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                // alert(data.message);
-                showAlert('success', data.message);
-                if (data.success) {
-                    // Réinitialiser le formulaire
-                    this.reset();
+                .then(res => res.json())
+                .then(data => {
+                    // alert(data.message);
+                    showAlert('success', data.message);
+                    if (data.success) {
+                        // Réinitialiser le formulaire
+                        this.reset();
 
-                    // Optionnel : recharger dynamiquement l'historique
-                    setTimeout(function() {
-                        location.reload();
-                    }, 3000)
-                } else {
-                    showAlert('error', data.message);
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                alert(err);
-            });
-    });
+                        // Optionnel : recharger dynamiquement l'historique
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000)
+                    } else {
+                        showAlert('error', data.message);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    alert(err);
+                });
+        });
     </script>
 
     <!-- PAGE RETRAIT -->
@@ -493,7 +503,8 @@ require_once "../app/controller.php";
                 <div class="bg-gray-50 rounded-lg p-4 mb-6">
                     <div class="flex items-center justify-between">
                         <span class="text-gray-600">Solde disponible:</span>
-                        <span class="text-xl font-bold text-primary">125 450 Ar</span>
+                        <span class="text-xl font-bold text-primary"
+                            id="userBalance"><?= number_format($solde_user, 0, ',', ' ') ?> Ar</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">Montant minimum de retrait: 5 000 Ar</p>
                 </div>
@@ -525,18 +536,6 @@ require_once "../app/controller.php";
                                     <p class="text-sm text-gray-500">Frais: 2%</p>
                                 </div>
                             </label>
-                            <label
-                                class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="withdrawMethod" value="bank"
-                                    class="text-primary focus:ring-primary">
-                                <div class="ml-3">
-                                    <div class="flex items-center">
-                                        <i class="bi bi-bank text-green-600 text-xl mr-2"></i>
-                                        <span class="font-medium">Virement bancaire</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500">Frais: 1 000 Ar</p>
-                                </div>
-                            </label>
                         </div>
                     </div>
 
@@ -545,26 +544,6 @@ require_once "../app/controller.php";
                         <input type="tel"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="034 XX XXX XX">
-                    </div>
-
-                    <div id="withdrawBankDetails" class="hidden space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nom de la banque</label>
-                            <select
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
-                                <option>Choisir une banque</option>
-                                <option>BNI Madagascar</option>
-                                <option>BOA Madagascar</option>
-                                <option>BFV-SG</option>
-                                <option>Autre</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Numéro de compte</label>
-                            <input type="text"
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="Numéro de compte bancaire">
-                        </div>
                     </div>
 
                     <!-- Récapitulatif -->
@@ -622,11 +601,37 @@ require_once "../app/controller.php";
                     </div>
                 </div>
             </div>
+
+            <!-- Historique des retraits -->
+            <div class="space-y-4" id="withdrawHistory">
+                <?php foreach ($retraits_hist as $retrait): ?>
+                    <?php
+                    $bg = 'bg-yellow-50 border-yellow-200 text-yellow-800'; // en cours
+                    if ($retrait['statut'] === 'valide') {
+                        $bg = 'bg-green-50 border-green-200 text-green-800';
+                    } elseif ($retrait['statut'] === 'annule') {
+                        $bg = 'bg-red-50 border-red-200 text-red-800';
+                    }
+                    $methode = ucfirst($retrait['methode']);
+                    $date = date('d/m/Y H:i', strtotime($retrait['date_retrait']));
+                    ?>
+                    <div class="flex items-center justify-between p-4 rounded-lg border <?= $bg ?>">
+                        <div>
+                            <p class="font-medium text-gray-900"><?= number_format($retrait['montant'], 0, ',', ' ') ?> Ar
+                            </p>
+                            <p class="text-sm text-gray-600"><?= $methode ?> - <?= $date ?></p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm font-medium">
+                            <?= $retrait['statut'] === 'valide' ? 'Terminé' : ($retrait['statut'] === 'annule' ? 'Annulé' : 'En cours') ?>
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </main>
     </div>
 
     <!-- PAGE PARRAINAGE -->
-    <div id="referral-page" class="page-content hidden">
+    <div id="" class="page-content hidden">
         <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
             <!-- Statistiques parrainage -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -1117,6 +1122,256 @@ require_once "../app/controller.php";
             </div>
         </main>
     </div>
+    <!-- PAGE PARRAINAGE -->
+    <div id="referral-page" class="page-content">
+        <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
+
+            <!-- Statistiques parrainage -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 p-3 rounded-lg">
+                            <i class="bi bi-people text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-600 text-sm">Total filleuls</p>
+                            <p class="text-2xl font-bold text-gray-900"><?= $filleuls_directs ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="flex items-center">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="bi bi-cash-coin text-primary text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-600 text-sm">Gains totaux</p>
+                            <p class="text-2xl font-bold text-gray-900">
+                                <?= number_format($commissions_gagnees, 0, ',', ' ') ?> Ar
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="flex items-center">
+                        <div class="bg-purple-100 p-3 rounded-lg">
+                            <i class="bi bi-graph-up text-purple-600 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-gray-600 text-sm">Ce mois</p>
+                            <p class="text-2xl font-bold text-gray-900"><?= number_format($solde_user, 0, ',', ' ') ?>
+                                Ar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lien de parrainage -->
+            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Votre lien de parrainage</h3>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <input type="text" id="referralLink" value="<?= $lien_parrainage ?>" readonly
+                            class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
+                    </div>
+                    <button onclick="copyReferralLink()"
+                        class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-medium">
+                        <i class="bi bi-copy mr-2"></i>Copier
+                    </button>
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
+                        <i class="bi bi-share mr-2"></i>Partager
+                    </button>
+                </div>
+                <p class="text-sm text-gray-600 mt-2">Gagnez 5% sur chaque dépôt de vos filleuls</p>
+            </div>
+
+            <!-- Structure de commission -->
+            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Structure de commission</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <?php foreach ($structure_commissions as $niveau): ?>
+                        <?php
+                        // Définition des couleurs selon le niveau
+                        $colors = [
+                            1 => ['bg' => 'bg-green-50', 'circle' => 'bg-primary text-white', 'border' => 'border-green-200', 'text' => 'text-primary'],
+                            2 => ['bg' => 'bg-blue-50', 'circle' => 'bg-blue-600 text-white', 'border' => 'border-blue-200', 'text' => 'text-blue-600'],
+                            3 => ['bg' => 'bg-purple-50', 'circle' => 'bg-purple-600 text-white', 'border' => 'border-purple-200', 'text' => 'text-purple-600'],
+                        ];
+                        $c = $colors[$niveau['niveau']] ?? ['bg' => 'bg-gray-50', 'circle' => 'bg-gray-600 text-white', 'border' => 'border-gray-200', 'text' => 'text-gray-600'];
+                        ?>
+                        <div class="text-center p-4 <?= $c['bg'] ?> rounded-lg border <?= $c['border'] ?>">
+                            <div
+                                class="<?= $c['circle'] ?> w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="font-bold"><?= $niveau['niveau'] ?></span>
+                            </div>
+                            <p class="font-medium text-gray-900">Niveau <?= $niveau['niveau'] ?></p>
+                            <p class="<?= $c['text'] ?> font-bold"><?= $niveau['pourcentage'] ?>%</p>
+                            <p class="text-sm text-gray-600"><?= $niveau['description'] ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+
+            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Structure de commission</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div
+                            class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span class="font-bold">1</span>
+                        </div>
+                        <p class="font-medium text-gray-900">Niveau 1</p>
+                        <p class="text-primary font-bold">5%</p>
+                        <p class="text-sm text-gray-600">Filleuls directs</p>
+                    </div>
+                    <div class="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div
+                            class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span class="font-bold">2</span>
+                        </div>
+                        <p class="font-medium text-gray-900">Niveau 2</p>
+                        <p class="text-blue-600 font-bold">3%</p>
+                        <p class="text-sm text-gray-600">Filleuls indirects</p>
+                    </div>
+                    <div class="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
+                        <div
+                            class="bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <span class="font-bold">3</span>
+                        </div>
+                        <p class="font-medium text-gray-900">Niveau 3</p>
+                        <p class="text-purple-600 font-bold">1%</p>
+                        <p class="text-sm text-gray-600">Bonus spécial</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Arbre de parrainage -->
+            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Hiérarchie de votre réseau</h3>
+                <div class="overflow-x-auto">
+                    <div class="min-w-full flex flex-col items-center">
+                        <div class="bg-primary text-white px-6 py-3 rounded-lg font-bold text-center">
+                            <div class="text-sm">VOUS</div>
+                            <div class="text-xs opacity-80">ID: <?= $id_parrainage ?></div>
+                        </div>
+
+                        <?php if ($referral_tree): ?>
+                            <div class="w-px h-8 bg-gray-300 my-2"></div>
+                            <div class="flex space-x-8">
+                                <?php foreach ($referral_tree as $filleul): ?>
+                                    <div class="flex flex-col items-center">
+                                        <div class="bg-blue-600 text-white px-4 py-2 rounded-lg text-center">
+                                            <div class="text-sm font-medium"><?= $filleul['prenom'] ?>         <?= $filleul['nom'] ?>
+                                            </div>
+                                            <div class="text-xs opacity-80">ID:
+                                                <?= str_pad($filleul['id'], 3, '0', STR_PAD_LEFT) ?>
+                                            </div>
+                                        </div>
+
+                                        <?php if (!empty($filleul['children'])): ?>
+                                            <div class="w-px h-6 bg-gray-300 my-2"></div>
+                                            <div class="flex space-x-4">
+                                                <?php foreach ($filleul['children'] as $child): ?>
+                                                    <div class="bg-green-500 text-white px-3 py-2 rounded text-center">
+                                                        <div class="text-xs font-medium"><?= $child['prenom'] ?>                 <?= $child['nom'] ?>
+                                                        </div>
+                                                        <div class="text-xs opacity-80">ID:
+                                                            <?= str_pad($child['id'], 3, '0', STR_PAD_LEFT) ?>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-gray-600 mt-4">Vous n'avez pas encore de filleuls.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des filleuls -->
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Tous les filleuls</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Filleul</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date
+                                    d'inscription</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Niveau</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dépôts
+                                    totaux</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vos gains
+                                </th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <?php foreach ($referral_tree as $filleul): ?>
+                                <?php
+                                // récupérer les infos financières pour chaque filleul
+                                $stmt = $pdo->prepare("SELECT SUM(montant) FROM investissements WHERE utilisateur_id = ?");
+                                $stmt->execute([$filleul['id']]);
+                                $depots_totaux = $stmt->fetchColumn();
+                                ?>
+                                <tr>
+                                    <td class="px-4 py-4 flex items-center">
+                                        <div
+                                            class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
+                                            <?= strtoupper(substr($filleul['prenom'], 0, 1)) ?>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="font-medium text-gray-900">
+                                                <?= $filleul['prenom'] . ' ' . $filleul['nom'] ?>
+                                            </p>
+                                            <p class="text-sm text-gray-500"><?= $filleul['email'] ?? '' ?></p>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm text-gray-600">
+                                        <?= date('d/m/Y', strtotime($filleul['date_inscription'])) ?>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span
+                                            class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Niveau
+                                            <?= $filleul['niveau'] ?></span>
+                                    </td>
+                                    <td class="px-4 py-4 text-sm font-medium text-gray-900">
+                                        <?= number_format($depots_totaux, 0, ',', ' ') ?> Ar
+                                    </td>
+                                    <td class="px-4 py-4 text-sm font-bold text-primary">
+                                        <?= number_format($filleul['gains'], 0, ',', ' ') ?> Ar
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span
+                                            class="bg-<?= $filleul['statut'] == 'Actif' ? 'green-100' : 'gray-100' ?> text-<?= $filleul['statut'] == 'Actif' ? 'green-800' : 'gray-800' ?> px-2 py-1 rounded-full text-xs font-medium"><?= $filleul['statut'] ?></span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function copyReferralLink() {
+            const copyText = document.getElementById("referralLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // mobile
+            document.execCommand("copy");
+            alert("Lien copié !");
+        }
+    </script>
 
     <!-- PAGE NIVEAUX -->
     <div id="levels-page" class="page-content hidden">
@@ -1138,120 +1393,120 @@ require_once "../app/controller.php";
                     </div>
                 </div>
                 <?php if ($prochain_niveau): ?>
-                <div class="mt-4">
-                    <div class="bg-white bg-opacity-20 rounded-full h-2">
-                        <div class="bg-white h-2 rounded-full" style="width: <?= $progress ?>%"></div>
+                    <div class="mt-4">
+                        <div class="bg-white bg-opacity-20 rounded-full h-2">
+                            <div class="bg-white h-2 rounded-full" style="width: <?= $progress ?>%"></div>
+                        </div>
+                        <p class="text-green-100 text-sm mt-1">
+                            <?= number_format($solde_user, 0, ',', ' ') ?> / <?= number_format($next_price, 0, ',', ' ') ?>
+                            Ar pour le niveau suivant
+                        </p>
                     </div>
-                    <p class="text-green-100 text-sm mt-1">
-                        <?= number_format($solde_user, 0, ',', ' ') ?> / <?= number_format($next_price, 0, ',', ' ') ?>
-                        Ar pour le niveau suivant
-                    </p>
-                </div>
                 <?php else: ?>
-                <p class="text-green-100 text-sm mt-2">Vous avez atteint le niveau maximum</p>
+                    <p class="text-green-100 text-sm mt-2">Vous avez atteint le niveau maximum</p>
                 <?php endif; ?>
             </div>
 
             <!-- Liste des niveaux -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <?php
-    // Définition des avantages fixes pour les niveaux 1 à 3
-    $avantages = [
-        1 => [
-            '✓ Accès au tableau de bord',
-            '✓ Dépôts et retraits',
-            '✓ Support client'
-        ],
-        2 => [
-            '✓ Toutes fonctions niveau 1',
-            '✓ Parrainage niveau 1',
-            '✓ Bonus 3%'
-        ],
-        3 => [
-            '✓ Toutes fonctions niveau 2',
-            '✓ Parrainage niveau 2',
-            '✓ Bonus 5%',
-            '✓ Support prioritaire'
-        ]
-    ];
-    ?>
+                // Définition des avantages fixes pour les niveaux 1 à 3
+                $avantages = [
+                    1 => [
+                        '✓ Accès au tableau de bord',
+                        '✓ Dépôts et retraits',
+                        '✓ Support client'
+                    ],
+                    2 => [
+                        '✓ Toutes fonctions niveau 1',
+                        '✓ Parrainage niveau 1',
+                        '✓ Bonus 3%'
+                    ],
+                    3 => [
+                        '✓ Toutes fonctions niveau 2',
+                        '✓ Parrainage niveau 2',
+                        '✓ Bonus 5%',
+                        '✓ Support prioritaire'
+                    ]
+                ];
+                ?>
 
                 <?php foreach ($structure_commissions as $niveau): ?>
-                <?php
-            $num = (int) $niveau['niveau'];
-            $prix = number_format($niveau['investissement'], 0, ',', ' ') . " Ar";
-            $isCurrent = ($num === $niveau_actuel);
-            $isUnlocked = ($num <= $niveau_actuel);
+                    <?php
+                    $num = (int) $niveau['niveau'];
+                    $prix = number_format($niveau['investissement'], 0, ',', ' ') . " Ar";
+                    $isCurrent = ($num === $niveau_actuel);
+                    $isUnlocked = ($num <= $niveau_actuel);
 
-            // Styles par défaut
-            $borderClass = $isUnlocked ? 'border-green-200' : 'border-gray-200';
-            $bgCircle = $isUnlocked ? 'bg-green-100' : 'bg-gray-100';
-            $iconColor = $isUnlocked ? 'text-green-600' : 'text-gray-500';
-            $statusBadge = '';
+                    // Styles par défaut
+                    $borderClass = $isUnlocked ? 'border-green-200' : 'border-gray-200';
+                    $bgCircle = $isUnlocked ? 'bg-green-100' : 'bg-gray-100';
+                    $iconColor = $isUnlocked ? 'text-green-600' : 'text-gray-500';
+                    $statusBadge = '';
 
-            // Badge selon état
-            if ($num !== 4) { // pour tous sauf niveau 4
-                if ($isUnlocked && !$isCurrent) {
-                    $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+                    // Badge selon état
+                    if ($num !== 4) { // pour tous sauf niveau 4
+                        if ($isUnlocked && !$isCurrent) {
+                            $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
                                         <i class="bi bi-check-circle mr-1"></i>Débloqué
                                     </span>';
-                } elseif ($isCurrent) {
-                    $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+                        } elseif ($isCurrent) {
+                            $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
                                         <i class="bi bi-check-circle-fill mr-1"></i>Actuel
                                     </span>';
-                } else {
-                    $statusBadge = '<button onclick="unlockLevel('.$num.')"
+                        } else {
+                            $statusBadge = '<button onclick="unlockLevel(' . $num . ')"
                                     class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
                                     <i class="bi bi-unlock mr-1"></i>Débloquer
                                 </button>';
-                }
-            }
-        ?>
+                        }
+                    }
+                    ?>
 
-                <!-- Exception : Niveau 4 -->
-                <?php if ($num === 4): ?>
-                <div class="bg-white rounded-xl p-6 shadow-md border-2 border-yellow-300 relative">
-                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                        <span
-                            class="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">NOUVEAU</span>
-                    </div>
-                    <div class="text-center">
-                        <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="bi bi-star-fill text-yellow-600 text-2xl"></i>
+                    <!-- Exception : Niveau 4 -->
+                    <?php if ($num === 4): ?>
+                        <div class="bg-white rounded-xl p-6 shadow-md border-2 border-yellow-300 relative">
+                            <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                                <span
+                                    class="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">NOUVEAU</span>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="bi bi-star-fill text-yellow-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Niveau 4</h3>
+                                <p class="text-yellow-600 font-bold text-lg mb-4"><?= $prix ?></p>
+                                <div class="space-y-2 text-sm text-gray-600 mb-6">
+                                    <p>✓ Toutes fonctions niveau 3</p>
+                                    <p>✓ Parrainage niveau 3</p>
+                                    <p>✓ Bonus 7%</p>
+                                    <p>✓ Retraits prioritaires</p>
+                                    <p>✓ Gestionnaire dédié</p>
+                                </div>
+                                <p class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                                    ⚡ Minage automatique activé
+                                </p>
+                            </div>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Niveau 4</h3>
-                        <p class="text-yellow-600 font-bold text-lg mb-4"><?= $prix ?></p>
-                        <div class="space-y-2 text-sm text-gray-600 mb-6">
-                            <p>✓ Toutes fonctions niveau 3</p>
-                            <p>✓ Parrainage niveau 3</p>
-                            <p>✓ Bonus 7%</p>
-                            <p>✓ Retraits prioritaires</p>
-                            <p>✓ Gestionnaire dédié</p>
+                    <?php else: ?>
+                        <!-- Niveaux 1 à 3 dynamiques -->
+                        <div class="bg-white rounded-xl p-6 shadow-md border-2 <?= $borderClass ?>">
+                            <div class="text-center">
+                                <div
+                                    class="<?= $bgCircle ?> w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="bi bi-star-fill <?= $iconColor ?> text-2xl"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Niveau <?= $num ?></h3>
+                                <p class="text-primary font-bold text-lg mb-4"><?= $prix ?></p>
+                                <div class="space-y-2 text-sm text-gray-600 mb-6">
+                                    <?php foreach ($avantages[$num] as $avantage): ?>
+                                        <p><?= $avantage ?></p>
+                                    <?php endforeach; ?>
+                                </div>
+                                <?= $statusBadge ?>
+                            </div>
                         </div>
-                        <p class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                            ⚡ Minage automatique activé
-                        </p>
-                    </div>
-                </div>
-                <?php else: ?>
-                <!-- Niveaux 1 à 3 dynamiques -->
-                <div class="bg-white rounded-xl p-6 shadow-md border-2 <?= $borderClass ?>">
-                    <div class="text-center">
-                        <div
-                            class="<?= $bgCircle ?> w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="bi bi-star-fill <?= $iconColor ?> text-2xl"></i>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-900 mb-2">Niveau <?= $num ?></h3>
-                        <p class="text-primary font-bold text-lg mb-4"><?= $prix ?></p>
-                        <div class="space-y-2 text-sm text-gray-600 mb-6">
-                            <?php foreach ($avantages[$num] as $avantage): ?>
-                            <p><?= $avantage ?></p>
-                            <?php endforeach; ?>
-                        </div>
-                        <?= $statusBadge ?>
-                    </div>
-                </div>
-                <?php endif; ?>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </div>
 
@@ -1350,473 +1605,444 @@ require_once "../app/controller.php";
     </nav>
 
     <script>
-    // Variables globales
-    let currentPage = 'dashboard';
-    let balanceChart;
+        // Variables globales
+        let currentPage = 'dashboard';
+        let balanceChart;
 
-    // Alert 
-    function showAlert(type, message) {
-        const alertSuccess = document.getElementById('alertSuccess');
-        const alertError = document.getElementById('alertError');
-        const alertSuccessMsg = document.getElementById('alertSuccessMessage');
-        const alertErrorMsg = document.getElementById('alertErrorMessage');
+        // Alert 
+        function showAlert(type, message) {
+            const alertSuccess = document.getElementById('alertSuccess');
+            const alertError = document.getElementById('alertError');
+            const alertSuccessMsg = document.getElementById('alertSuccessMessage');
+            const alertErrorMsg = document.getElementById('alertErrorMessage');
 
-        // Réinitialise les alertes
-        alertSuccess.classList.add('hidden');
-        alertError.classList.add('hidden');
-
-        if (type === 'success') {
-            alertSuccessMsg.textContent = message;
-            alertSuccess.classList.remove('hidden');
-        } else {
-            alertErrorMsg.textContent = message;
-            alertError.classList.remove('hidden');
-        }
-
-        // Masquer après 4 secondes
-        setTimeout(() => {
+            // Réinitialise les alertes
             alertSuccess.classList.add('hidden');
             alertError.classList.add('hidden');
-        }, 4000);
-    }
 
+            if (type === 'success') {
+                alertSuccessMsg.textContent = message;
+                alertSuccess.classList.remove('hidden');
+            } else {
+                alertErrorMsg.textContent = message;
+                alertError.classList.remove('hidden');
+            }
 
-    // Gestion des pages
-    function showPage(pageName) {
-        // Masquer toutes les pages
-        document.querySelectorAll('.page-content').forEach(page => {
-            page.classList.add('hidden');
-        });
-
-        // Afficher la page demandée
-        document.getElementById(pageName + '-page').classList.remove('hidden');
-
-        // Mettre à jour la navigation
-        updateNavigation(pageName);
-
-        // Fermer le menu mobile
-        document.getElementById('mobileMenu').classList.add('hidden');
-
-        // Actions spécifiques par page
-        if (pageName === 'dashboard' && !balanceChart) {
-            initializeChart();
+            // Masquer après 4 secondes
+            setTimeout(() => {
+                alertSuccess.classList.add('hidden');
+                alertError.classList.add('hidden');
+            }, 4000);
         }
 
-        currentPage = pageName;
-    }
 
-    // Mise à jour de la navigation
-    function updateNavigation(activePage) {
-        // Navigation desktop
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('text-primary', 'border-primary');
-            link.classList.add('text-gray-500');
-        });
+        // Gestion des pages
+        function showPage(pageName) {
+            // Masquer toutes les pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
 
-        // Navigation mobile menu
-        document.querySelectorAll('.mobile-nav-link').forEach(link => {
-            link.classList.remove('text-primary', 'bg-green-50');
-            link.classList.add('text-gray-700');
-        });
+            // Afficher la page demandée
+            document.getElementById(pageName + '-page').classList.remove('hidden');
 
-        // Navigation mobile bottom
-        document.querySelectorAll('.mobile-bottom-nav').forEach(link => {
-            link.classList.remove('text-primary');
-            link.classList.add('text-gray-600');
-        });
+            // Mettre à jour la navigation
+            updateNavigation(pageName);
 
-        // Activer les liens correspondants
-        const pageMap = {
-            'dashboard': 0,
-            'deposit': 1,
-            'withdraw': 2,
-            'referral': 3,
-            'levels': 4
-        };
+            // Fermer le menu mobile
+            document.getElementById('mobileMenu').classList.add('hidden');
 
-        const index = pageMap[activePage];
+            // Actions spécifiques par page
+            if (pageName === 'dashboard' && !balanceChart) {
+                initializeChart();
+            }
 
-        // Desktop
-        const desktopLinks = document.querySelectorAll('.nav-link');
-        if (desktopLinks[index]) {
-            desktopLinks[index].classList.remove('text-gray-500');
-            desktopLinks[index].classList.add('text-primary', 'border-primary');
+            currentPage = pageName;
         }
 
-        // Mobile menu
-        const mobileMenuLinks = document.querySelectorAll('.mobile-nav-link');
-        if (mobileMenuLinks[index]) {
-            mobileMenuLinks[index].classList.remove('text-gray-700');
-            mobileMenuLinks[index].classList.add('text-primary', 'bg-green-50');
+        // Mise à jour de la navigation
+        function updateNavigation(activePage) {
+            // Navigation desktop
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-primary', 'border-primary');
+                link.classList.add('text-gray-500');
+            });
+
+            // Navigation mobile menu
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.classList.remove('text-primary', 'bg-green-50');
+                link.classList.add('text-gray-700');
+            });
+
+            // Navigation mobile bottom
+            document.querySelectorAll('.mobile-bottom-nav').forEach(link => {
+                link.classList.remove('text-primary');
+                link.classList.add('text-gray-600');
+            });
+
+            // Activer les liens correspondants
+            const pageMap = {
+                'dashboard': 0,
+                'deposit': 1,
+                'withdraw': 2,
+                'referral': 3,
+                'levels': 4
+            };
+
+            const index = pageMap[activePage];
+
+            // Desktop
+            const desktopLinks = document.querySelectorAll('.nav-link');
+            if (desktopLinks[index]) {
+                desktopLinks[index].classList.remove('text-gray-500');
+                desktopLinks[index].classList.add('text-primary', 'border-primary');
+            }
+
+            // Mobile menu
+            const mobileMenuLinks = document.querySelectorAll('.mobile-nav-link');
+            if (mobileMenuLinks[index]) {
+                mobileMenuLinks[index].classList.remove('text-gray-700');
+                mobileMenuLinks[index].classList.add('text-primary', 'bg-green-50');
+            }
+
+            // Mobile bottom
+            const mobileBottomLinks = document.querySelectorAll('.mobile-bottom-nav');
+            if (mobileBottomLinks[index]) {
+                mobileBottomLinks[index].classList.remove('text-gray-600');
+                mobileBottomLinks[index].classList.add('text-primary');
+            }
         }
 
-        // Mobile bottom
-        const mobileBottomLinks = document.querySelectorAll('.mobile-bottom-nav');
-        if (mobileBottomLinks[index]) {
-            mobileBottomLinks[index].classList.remove('text-gray-600');
-            mobileBottomLinks[index].classList.add('text-primary');
-        }
-    }
+        // Menu mobile toggle
+        document.getElementById('menuToggle').addEventListener('click', function () {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        });
 
-    // Menu mobile toggle
-    document.getElementById('menuToggle').addEventListener('click', function() {
-        const menu = document.getElementById('mobileMenu');
-        menu.classList.toggle('hidden');
-    });
-
-    // Initialisation du graphique
-    function initializeChart() {
-        const ctx = document.getElementById('balanceChart').getContext('2d');
-        balanceChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'],
-                datasets: [{
-                    label: 'Solde (Ar)',
-                    data: [50000, 75000, 60000, 90000, 110000, 125450],
-                    borderColor: '#16a34a',
-                    backgroundColor: 'rgba(22, 163, 74, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
+        // Initialisation du graphique
+        function initializeChart() {
+            const ctx = document.getElementById('balanceChart').getContext('2d');
+            balanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Solde (Ar)',
+                        data: [50000, 75000, 60000, 90000, 110000, 125450],
+                        borderColor: '#16a34a',
+                        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString() + ' Ar';
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return value.toLocaleString() + ' Ar';
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-    }
+            });
+        }
 
-    // Gestion du formulaire de dépôt
-    document.addEventListener('DOMContentLoaded', function() {
-        // Formulaire de dépôt
-        const depositForm = document.getElementById('depositForm');
-        if (depositForm) {
-            const paymentMethods = depositForm.querySelectorAll('input[name="paymentMethod"]');
-            const mobileDetails = document.getElementById('mobileMoneyDetails');
-            const bankDetails = document.getElementById('bankDetails');
+        // Gestion du formulaire de dépôt
+        document.addEventListener('DOMContentLoaded', function () {
+            // Formulaire de dépôt
+            const depositForm = document.getElementById('depositForm');
+            if (depositForm) {
+                const paymentMethods = depositForm.querySelectorAll('input[name="paymentMethod"]');
+                const mobileDetails = document.getElementById('mobileMoneyDetails');
+                const bankDetails = document.getElementById('bankDetails');
 
-            paymentMethods.forEach(method => {
-                method.addEventListener('change', function() {
-                    if (this.value === 'mobile') {
-                        mobileDetails.classList.remove('hidden');
-                        bankDetails.classList.add('hidden');
-                    } else if (this.value === 'bank') {
-                        bankDetails.classList.remove('hidden');
+                paymentMethods.forEach(method => {
+                    method.addEventListener('change', function () {
+                        if (this.value === 'mobile') {
+                            mobileDetails.classList.remove('hidden');
+                            bankDetails.classList.add('hidden');
+                        } else if (this.value === 'bank') {
+                            bankDetails.classList.remove('hidden');
+                            mobileDetails.classList.add('hidden');
+                        }
+                    });
+                });
+
+                depositForm.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const amount = document.getElementById('depositAmount').value;
+                    const transactionId = document.getElementById('transactionId').value;
+                    const proofFile = document.getElementById('proofUpload').files[0];
+
+                    if (amount && amount >= 1000 && transactionId && proofFile) {
+                        alert(
+                            `Demande de dépôt de ${parseInt(amount).toLocaleString()} Ar envoyée avec succès !\nID transaction: ${transactionId}\nPreuve jointe: ${proofFile.name}`
+                        );
+                        this.reset();
                         mobileDetails.classList.add('hidden');
+                        bankDetails.classList.add('hidden');
+                        resetFileUpload();
+                    } else {
+                        let errorMsg = 'Veuillez compléter tous les champs requis:\n';
+                        if (!amount || amount < 1000) errorMsg += '- Montant valide (minimum 1 000 Ar)\n';
+                        if (!transactionId) errorMsg += '- ID de transaction\n';
+                        if (!proofFile) errorMsg += '- Preuve de dépôt (image)';
+                        alert(errorMsg);
                     }
                 });
-            });
-
-            depositForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const amount = document.getElementById('depositAmount').value;
-                const transactionId = document.getElementById('transactionId').value;
-                const proofFile = document.getElementById('proofUpload').files[0];
-
-                if (amount && amount >= 1000 && transactionId && proofFile) {
-                    alert(
-                        `Demande de dépôt de ${parseInt(amount).toLocaleString()} Ar envoyée avec succès !\nID transaction: ${transactionId}\nPreuve jointe: ${proofFile.name}`
-                    );
-                    this.reset();
-                    mobileDetails.classList.add('hidden');
-                    bankDetails.classList.add('hidden');
-                    resetFileUpload();
-                } else {
-                    let errorMsg = 'Veuillez compléter tous les champs requis:\n';
-                    if (!amount || amount < 1000) errorMsg += '- Montant valide (minimum 1 000 Ar)\n';
-                    if (!transactionId) errorMsg += '- ID de transaction\n';
-                    if (!proofFile) errorMsg += '- Preuve de dépôt (image)';
-                    alert(errorMsg);
-                }
-            });
-        }
-
-        // Formulaire de retrait
-        const withdrawForm = document.getElementById('withdrawForm');
-        if (withdrawForm) {
-            const withdrawMethods = withdrawForm.querySelectorAll('input[name="withdrawMethod"]');
-            const withdrawMobileDetails = document.getElementById('withdrawMobileDetails');
-            const withdrawBankDetails = document.getElementById('withdrawBankDetails');
-            const withdrawSummary = document.getElementById('withdrawSummary');
-            const withdrawAmount = document.getElementById('withdrawAmount');
-
-            withdrawMethods.forEach(method => {
-                method.addEventListener('change', function() {
-                    if (this.value === 'mobile') {
-                        withdrawMobileDetails.classList.remove('hidden');
-                        withdrawBankDetails.classList.add('hidden');
-                    } else if (this.value === 'bank') {
-                        withdrawBankDetails.classList.remove('hidden');
-                        withdrawMobileDetails.classList.add('hidden');
-                    }
-                    updateWithdrawSummary();
-                });
-            });
-
-            withdrawAmount.addEventListener('input', updateWithdrawSummary);
-
-            function updateWithdrawSummary() {
-                const amount = parseInt(withdrawAmount.value) || 0;
-                const selectedMethod = withdrawForm.querySelector('input[name="withdrawMethod"]:checked');
-
-                if (amount > 0 && selectedMethod) {
-                    let fees = 0;
-                    if (selectedMethod.value === 'mobile') {
-                        fees = Math.round(amount * 0.02); // 2%
-                    } else if (selectedMethod.value === 'bank') {
-                        fees = 1000; // 1000 Ar fixe
-                    }
-
-                    const finalAmount = amount - fees;
-
-                    document.getElementById('requestedAmount').textContent = amount.toLocaleString() + ' Ar';
-                    document.getElementById('withdrawFees').textContent = fees.toLocaleString() + ' Ar';
-                    document.getElementById('finalAmount').textContent = finalAmount.toLocaleString() + ' Ar';
-
-                    withdrawSummary.classList.remove('hidden');
-                } else {
-                    withdrawSummary.classList.add('hidden');
-                }
             }
 
-            withdrawForm.addEventListener('submit', function(e) {
+            // Formulaire de retrait
+            const form = document.getElementById('withdrawForm');
+
+            form.addEventListener('submit', function (e) {
+               alert()
                 e.preventDefault();
-                const amount = parseInt(withdrawAmount.value);
-                if (amount && amount >= 5000 && amount <= 125450) {
-                    alert(`Demande de retrait de ${amount.toLocaleString()} Ar envoyée avec succès !`);
-                    this.reset();
-                    withdrawMobileDetails.classList.add('hidden');
-                    withdrawBankDetails.classList.add('hidden');
-                    withdrawSummary.classList.add('hidden');
-                } else {
-                    alert('Veuillez entrer un montant valide (entre 5 000 et 125 450 Ar)');
+
+                const amount = document.getElementById('withdrawAmount').value;
+                const method = form.withdrawMethod.value;
+
+                if (!amount || amount < 5000) {
+                    alert("Montant minimum: 5 000 Ar");
+                    return;
                 }
+
+                fetch('retrait.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        montant: amount,
+                        methode: method
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Mise à jour du solde
+                            document.getElementById('userBalance').textContent = data.newBalance + ' Ar';
+
+                            // Réinitialiser le formulaire
+                            form.reset();
+                        } else {
+                            alert(data.message || "Erreur lors du retrait");
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert("Erreur serveur");
+                    });
             });
-        }
-    });
+        });
 
-    // Copier le lien de parrainage
-    function copyReferralLink() {
-        const link = document.getElementById('referralLink');
-        link.select();
-        document.execCommand('copy');
+        // Copier le lien de parrainage
+        function copyReferralLink() {
+            const link = document.getElementById('referralLink');
+            link.select();
+            document.execCommand('copy');
 
-        // Feedback visuel
-        const button = event.target.closest('button');
-        const originalText = button.innerHTML;
-        button.innerHTML = '<i class="bi bi-check mr-2"></i>Copié !';
-        button.classList.add('bg-green-600');
-
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.classList.remove('bg-green-600');
-        }, 2000);
-    }
-
-    // Débloquer un niveau
-    function unlockLevel(level) {
-        const currentBalance = 125450;
-        const requiredAmount = 15000;
-
-        if (currentBalance >= requiredAmount) {
-            alert(`Félicitations ! Vous avez débloqué le niveau ${level} !`);
-            // Ici, vous pourriez mettre à jour l'interface pour refléter le nouveau niveau
-        } else {
-            const missing = requiredAmount - currentBalance;
-            alert(`Il vous manque ${missing.toLocaleString()} Ar pour débloquer ce niveau.`);
-        }
-    }
-
-    // Fonctions pour le dépôt rapide
-    function updateUSSDCode() {
-        const amount = document.getElementById('quickDepositAmount').value || '1000';
-        const ussdCode = `#144*1*1*032274356*0322743567*${amount}#`;
-        document.getElementById('ussdCode').textContent = ussdCode;
-    }
-
-    function copyUSSDCode() {
-        const code = document.getElementById('ussdCode').textContent;
-        navigator.clipboard.writeText(code).then(() => {
+            // Feedback visuel
             const button = event.target.closest('button');
-            const originalHTML = button.innerHTML;
-            button.innerHTML = '<i class="bi bi-check"></i>';
-            button.classList.add('bg-green-700');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check mr-2"></i>Copié !';
+            button.classList.add('bg-green-600');
 
             setTimeout(() => {
-                button.innerHTML = originalHTML;
-                button.classList.remove('bg-green-700');
+                button.innerHTML = originalText;
+                button.classList.remove('bg-green-600');
             }, 2000);
-        });
-    }
-
-    function callUSSD() {
-        const code = document.getElementById('ussdCode').textContent;
-        // Simuler l'appel USSD
-        if (confirm(`Voulez-vous composer le code USSD :\n${code}`)) {
-            alert('Redirection vers l\'application téléphone...');
-            // Dans une vraie application mobile, ceci ouvrirait le dialer
-            // window.location.href = `tel:${encodeURIComponent(code)}`;
         }
-    }
 
-    // Gestion des onglets de niveau de parrainage
-    function showLevelTab(level) {
-        // Masquer tous les contenus
-        document.querySelectorAll('.level-content').forEach(content => {
-            content.classList.add('hidden');
-        });
+        // Débloquer un niveau
+        function unlockLevel(level) {
+            fetch('investissement.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ niveau: level })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.message);
 
-        // Réinitialiser tous les onglets
-        document.querySelectorAll('.level-tab').forEach(tab => {
-            tab.classList.remove('bg-primary', 'text-white');
-            tab.classList.add('text-gray-600', 'hover:text-gray-900');
-        });
+                        // Recharger la page après 1,5s
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 3000);
 
-        // Afficher le contenu sélectionné
-        document.getElementById(`level-${level}-content`).classList.remove('hidden');
+                    } else {
+                        showAlert('error', data.message);
+                        // alert(`Erreur : ${data.message}`);
+                    }
+                })
+                .catch(error => {
+                    // console.error(error);
+                    showAlert('error', 'Erreur serveur.');
+                });
+        }
 
-        // Activer l'onglet sélectionné
-        const activeTab = document.querySelector(`button[onclick="showLevelTab(${level})"]`);
-        activeTab.classList.remove('text-gray-600', 'hover:text-gray-900');
-        activeTab.classList.add('bg-primary', 'text-white');
-    }
 
-    // Animations au scroll
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
+        // Fonctions pour le dépôt rapide
+        function updateUSSDCode() {
+            const amount = document.getElementById('quickDepositAmount').value || '1000';
+            const ussdCode = `#144*1*1*032274356*0322743567*${amount}#`;
+            document.getElementById('ussdCode').textContent = ussdCode;
+        }
+
+        function copyUSSDCode() {
+            const code = document.getElementById('ussdCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const button = event.target.closest('button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check"></i>';
+                button.classList.add('bg-green-700');
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('bg-green-700');
+                }, 2000);
+            });
+        }
+
+        function callUSSD() {
+            const code = document.getElementById('ussdCode').textContent;
+            // Simuler l'appel USSD
+            if (confirm(`Voulez-vous composer le code USSD :\n${code}`)) {
+                alert('Redirection vers l\'application téléphone...');
+                // Dans une vraie application mobile, ceci ouvrirait le dialer
+                // window.location.href = `tel:${encodeURIComponent(code)}`;
+            }
+        }
+
+        // Gestion des onglets de niveau de parrainage
+        function showLevelTab(level) {
+            // Masquer tous les contenus
+            document.querySelectorAll('.level-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Réinitialiser tous les onglets
+            document.querySelectorAll('.level-tab').forEach(tab => {
+                tab.classList.remove('bg-primary', 'text-white');
+                tab.classList.add('text-gray-600', 'hover:text-gray-900');
+            });
+
+            // Afficher le contenu sélectionné
+            document.getElementById(`level-${level}-content`).classList.remove('hidden');
+
+            // Activer l'onglet sélectionné
+            const activeTab = document.querySelector(`button[onclick="showLevelTab(${level})"]`);
+            activeTab.classList.remove('text-gray-600', 'hover:text-gray-900');
+            activeTab.classList.add('bg-primary', 'text-white');
+        }
+
+        // Animations au scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Gestion de l'upload de fichier
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Vérifier le type de fichier
+            if (!file.type.startsWith('image/')) {
+                alert('Veuillez sélectionner un fichier image (PNG, JPG, etc.)');
+                return;
+            }
+
+            // Vérifier la taille (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Le fichier est trop volumineux. Taille maximum: 5MB');
+                return;
+            }
+
+            // Afficher la prévisualisation
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('uploadArea').classList.add('hidden');
+                document.getElementById('uploadPreview').classList.remove('hidden');
+                document.getElementById('previewImage').src = e.target.result;
+                document.getElementById('fileName').textContent = file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeFile() {
+            document.getElementById('proofUpload').value = '';
+            document.getElementById('uploadArea').classList.remove('hidden');
+            document.getElementById('uploadPreview').classList.add('hidden');
+            document.getElementById('previewImage').src = '';
+            document.getElementById('fileName').textContent = '';
+        }
+
+        function resetFileUpload() {
+            removeFile();
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function () {
+            // Appliquer les animations aux cartes
+            document.querySelectorAll('.bg-white').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Initialiser le graphique si on est sur le dashboard
+            if (currentPage === 'dashboard') {
+                setTimeout(initializeChart, 100);
+            }
+
+            // Event listener pour le dépôt rapide
+            const quickDepositAmount = document.getElementById('quickDepositAmount');
+            if (quickDepositAmount) {
+                quickDepositAmount.addEventListener('input', updateUSSDCode);
             }
         });
-    }, observerOptions);
-
-    // Gestion de l'upload de fichier
-    function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        // Vérifier le type de fichier
-        if (!file.type.startsWith('image/')) {
-            alert('Veuillez sélectionner un fichier image (PNG, JPG, etc.)');
-            return;
-        }
-
-        // Vérifier la taille (5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Le fichier est trop volumineux. Taille maximum: 5MB');
-            return;
-        }
-
-        // Afficher la prévisualisation
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('uploadArea').classList.add('hidden');
-            document.getElementById('uploadPreview').classList.remove('hidden');
-            document.getElementById('previewImage').src = e.target.result;
-            document.getElementById('fileName').textContent = file.name;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function removeFile() {
-        document.getElementById('proofUpload').value = '';
-        document.getElementById('uploadArea').classList.remove('hidden');
-        document.getElementById('uploadPreview').classList.add('hidden');
-        document.getElementById('previewImage').src = '';
-        document.getElementById('fileName').textContent = '';
-    }
-
-    function resetFileUpload() {
-        removeFile();
-    }
-
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', function() {
-        // Appliquer les animations aux cartes
-        document.querySelectorAll('.bg-white').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
-        });
-
-        // Initialiser le graphique si on est sur le dashboard
-        if (currentPage === 'dashboard') {
-            setTimeout(initializeChart, 100);
-        }
-
-        // Event listener pour le dépôt rapide
-        const quickDepositAmount = document.getElementById('quickDepositAmount');
-        if (quickDepositAmount) {
-            quickDepositAmount.addEventListener('input', updateUSSDCode);
-        }
-    });
     </script>
 
     <script>
-    // Toggle dropdown
-    const dropdownBtn = document.getElementById('userDropdownBtn');
-    const dropdown = document.getElementById('userDropdown');
+        // Toggle dropdown
+        const dropdownBtn = document.getElementById('userDropdownBtn');
+        const dropdown = document.getElementById('userDropdown');
 
-    dropdownBtn.addEventListener('click', () => {
-        dropdown.classList.toggle('hidden');
-    });
+        dropdownBtn.addEventListener('click', () => {
+            dropdown.classList.toggle('hidden');
+        });
 
-    // Fermer dropdown si clic en dehors
-    document.addEventListener('click', (event) => {
-        if (!dropdownBtn.contains(event.target) && !dropdown.contains(event.target)) {
-            dropdown.classList.add('hidden');
-        }
-    });
-
-    // Déconnexion
-    const logoutBtn = document.getElementById('logoutBtn');
-
-
-    logoutBtn.addEventListener('click', async () => {
-        try {
-            const response = await fetch('logout.php', {
-                method: 'POST'
-            });
-            const result = await response.json();
-
-            if (result.success) {
-
-                setTimeout(() => {
-                    window.location.href = 'login.php'; // page de connexion
-                }, 3000);
-            } else {
-                alert('Erreur lors de la déconnexion.');
+        // Fermer dropdown si clic en dehors
+        document.addEventListener('click', (event) => {
+            if (!dropdownBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
             }
-        } catch (error) {
-            console.error('Erreur:', error);
-            alert('Erreur serveur.');
-        }
-    });
-    </script>
+        });
 
+    </script>
 
 </body>
 
