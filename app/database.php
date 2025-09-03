@@ -50,7 +50,8 @@ class Database
     {
         self::create_database();
         $pdo = self::pdo();
-        if (!$pdo) return;
+        if (!$pdo)
+            return;
 
         $tables = [
             // utilisateurs
@@ -153,9 +154,10 @@ class Database
         $stmt = $pdo->query("SELECT COUNT(*) FROM niveaux");
         if ($stmt->fetchColumn() == 0) {
             $niveauxData = [
-                [1, 5000, 10000, 7500, 2500, 2],
-                [2, 7500, 30000, 15000, 15000, 4],
-                [3, 15000, 120000, 60000, 60000, 8],
+                [1, 15000, 30000, 20000, 10000, 2],
+                [2, 20000, 80000, 40000, 40000, 4],
+                [3, 40000, 320000, 160000, 160000, 8],
+                [4, 160000, 2560000, 1280000, 1280000, 16],
             ];
             $stmtInsert = $pdo->prepare("INSERT INTO niveaux (niveau, investissement, apprendre, mise_a_niveau, profil_restant, parrainage)
                                          VALUES (?, ?, ?, ?, ?, ?)");

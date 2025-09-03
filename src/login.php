@@ -8,17 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    primary: '#16a34a',
-                    'primary-dark': '#15803d',
-                    'primary-light': '#22c55e'
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#16a34a',
+                        'primary-dark': '#15803d',
+                        'primary-light': '#22c55e'
+                    }
                 }
             }
         }
-    }
     </script>
 </head>
 
@@ -298,356 +298,356 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-    // Variables globales
-    let currentTab = 'login';
+        // Variables globales
+        let currentTab = 'login';
 
-    // Gestion des onglets
-    function showTab(tabName) {
-        // Masquer tous les formulaires
-        document.querySelectorAll('.auth-form').forEach(form => {
-            form.classList.add('hidden');
-        });
+        // Gestion des onglets
+        function showTab(tabName) {
+            // Masquer tous les formulaires
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.classList.add('hidden');
+            });
 
-        // Réinitialiser les onglets
-        document.getElementById('loginTab').classList.remove('bg-primary', 'text-white');
-        document.getElementById('loginTab').classList.add('text-gray-600', 'hover:text-gray-900');
-        document.getElementById('registerTab').classList.remove('bg-primary', 'text-white');
-        document.getElementById('registerTab').classList.add('text-gray-600', 'hover:text-gray-900');
+            // Réinitialiser les onglets
+            document.getElementById('loginTab').classList.remove('bg-primary', 'text-white');
+            document.getElementById('loginTab').classList.add('text-gray-600', 'hover:text-gray-900');
+            document.getElementById('registerTab').classList.remove('bg-primary', 'text-white');
+            document.getElementById('registerTab').classList.add('text-gray-600', 'hover:text-gray-900');
 
-        // Afficher le formulaire sélectionné
-        if (tabName === 'login') {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('loginTab').classList.remove('text-gray-600', 'hover:text-gray-900');
-            document.getElementById('loginTab').classList.add('bg-primary', 'text-white');
-        } else {
-            document.getElementById('registerForm').classList.remove('hidden');
-            document.getElementById('registerTab').classList.remove('text-gray-600', 'hover:text-gray-900');
-            document.getElementById('registerTab').classList.add('bg-primary', 'text-white');
-        }
-
-        currentTab = tabName;
-    }
-
-    // Basculer la visibilité du mot de passe
-    function togglePassword(inputId) {
-        const input = document.getElementById(inputId);
-        const icon = document.getElementById(inputId + 'Icon');
-
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
-        }
-    }
-
-    // Validation du mot de passe en temps réel
-    function checkPasswordStrength(password) {
-        const strengthIndicator = document.getElementById('passwordStrength');
-        const bars = strengthIndicator.querySelectorAll('div div');
-
-        let strength = 0;
-        if (password.length >= 8) strength++;
-        if (/[A-Z]/.test(password)) strength++;
-        if (/[0-9]/.test(password)) strength++;
-        if (/[^A-Za-z0-9]/.test(password)) strength++;
-
-        // Réinitialiser les barres
-        bars.forEach(bar => {
-            bar.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
-            bar.classList.add('bg-gray-200');
-        });
-
-        // Colorer selon la force
-        const colors = ['bg-red-500', 'bg-red-500', 'bg-yellow-500', 'bg-green-500'];
-        const color = colors[strength - 1] || 'bg-gray-200';
-
-        for (let i = 0; i < strength; i++) {
-            bars[i].classList.remove('bg-gray-200');
-            bars[i].classList.add(color);
-        }
-
-        strengthIndicator.classList.remove('hidden');
-    }
-
-    // Vérifier la correspondance des mots de passe
-    function checkPasswordMatch() {
-        const password = document.getElementById('registerPassword').value;
-        const confirmPassword = document.getElementById('registerConfirmPassword').value;
-        const matchIndicator = document.getElementById('passwordMatch');
-
-        if (confirmPassword.length > 0) {
-            if (password === confirmPassword) {
-                matchIndicator.innerHTML =
-                    '<span class="text-green-600"><i class="bi bi-check-circle mr-1"></i>Les mots de passe correspondent</span>';
-                matchIndicator.classList.remove('hidden');
+            // Afficher le formulaire sélectionné
+            if (tabName === 'login') {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('loginTab').classList.remove('text-gray-600', 'hover:text-gray-900');
+                document.getElementById('loginTab').classList.add('bg-primary', 'text-white');
             } else {
-                matchIndicator.innerHTML =
-                    '<span class="text-red-600"><i class="bi bi-x-circle mr-1"></i>Les mots de passe ne correspondent pas</span>';
-                matchIndicator.classList.remove('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+                document.getElementById('registerTab').classList.remove('text-gray-600', 'hover:text-gray-900');
+                document.getElementById('registerTab').classList.add('bg-primary', 'text-white');
             }
-        } else {
-            matchIndicator.classList.add('hidden');
+
+            currentTab = tabName;
         }
-    }
 
-    // Valider l'ID du parrain
-    let sponsorTimeout;
+        // Basculer la visibilité du mot de passe
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + 'Icon');
 
-    async function validateSponsorId(sponsorId) {
-        const validationDiv = document.getElementById('sponsorValidation');
-        clearTimeout(sponsorTimeout);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
 
-        if (sponsorId.length > 0) {
-            sponsorTimeout = setTimeout(async () => {
-                try {
-                    const response = await fetch('validate_sponsor_id.php', {
-                        method: 'POST',
-                        body: new URLSearchParams({
-                            parrain_id: sponsorId
-                        })
+        // Validation du mot de passe en temps réel
+        function checkPasswordStrength(password) {
+            const strengthIndicator = document.getElementById('passwordStrength');
+            const bars = strengthIndicator.querySelectorAll('div div');
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            // Réinitialiser les barres
+            bars.forEach(bar => {
+                bar.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+                bar.classList.add('bg-gray-200');
+            });
+
+            // Colorer selon la force
+            const colors = ['bg-red-500', 'bg-red-500', 'bg-yellow-500', 'bg-green-500'];
+            const color = colors[strength - 1] || 'bg-gray-200';
+
+            for (let i = 0; i < strength; i++) {
+                bars[i].classList.remove('bg-gray-200');
+                bars[i].classList.add(color);
+            }
+
+            strengthIndicator.classList.remove('hidden');
+        }
+
+        // Vérifier la correspondance des mots de passe
+        function checkPasswordMatch() {
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const matchIndicator = document.getElementById('passwordMatch');
+
+            if (confirmPassword.length > 0) {
+                if (password === confirmPassword) {
+                    matchIndicator.innerHTML =
+                        '<span class="text-green-600"><i class="bi bi-check-circle mr-1"></i>Les mots de passe correspondent</span>';
+                    matchIndicator.classList.remove('hidden');
+                } else {
+                    matchIndicator.innerHTML =
+                        '<span class="text-red-600"><i class="bi bi-x-circle mr-1"></i>Les mots de passe ne correspondent pas</span>';
+                    matchIndicator.classList.remove('hidden');
+                }
+            } else {
+                matchIndicator.classList.add('hidden');
+            }
+        }
+
+        // Valider l'ID du parrain
+        let sponsorTimeout;
+
+        async function validateSponsorId(sponsorId) {
+            const validationDiv = document.getElementById('sponsorValidation');
+            clearTimeout(sponsorTimeout);
+
+            if (sponsorId.length > 0) {
+                sponsorTimeout = setTimeout(async () => {
+                    try {
+                        const response = await fetch('validate_sponsor_id.php', {
+                            method: 'POST',
+                            body: new URLSearchParams({
+                                parrain_id: sponsorId
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            validationDiv.innerHTML =
+                                `<span class="text-green-600"><i class="bi bi-check-circle mr-1"></i>Parrain trouvé </span>`;
+                        } else {
+                            validationDiv.innerHTML =
+                                '<span class="text-red-600"><i class="bi bi-x-circle mr-1"></i>ID parrain non trouvé</span>';
+                        }
+
+                        validationDiv.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Erreur lors de la validation du parrain:', error);
+                        validationDiv.innerHTML =
+                            '<span class="text-red-600"><i class="bi bi-exclamation-triangle mr-1"></i>Erreur serveur</span>';
+                        validationDiv.classList.remove('hidden');
+                    }
+                }, 500); // petit délai pour éviter trop de requêtes
+            } else {
+                validationDiv.classList.add('hidden');
+            }
+        }
+
+
+        // Gestion de la connexion
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const phone = document.getElementById('loginPhone').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const alertDiv = document.getElementById('alertError');
+            const alertDivSucces = document.getElementById('alertSuccess');
+
+            // Masquer l'alerte au début
+            alertDiv.classList.add('hidden');
+
+            if (!phone || !password) {
+                alertDiv.textContent = 'Veuillez remplir tous les champs';
+                alertDiv.classList.remove('hidden');
+                return;
+            }
+
+            const loadingButton = event.target.querySelector('button[type="submit"]');
+            const originalText = loadingButton.innerHTML;
+            loadingButton.innerHTML = '<i class="bi bi-hourglass-split mr-2"></i>Connexion...';
+            loadingButton.disabled = true;
+
+            try {
+                const response = await fetch('auth.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        telephone: phone,
+                        mot_de_passe: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Masquer l'alerte d'erreur si elle est affichée
+                    alertDiv.classList.add('hidden');
+
+                    // Afficher l'alerte succès
+                    alertDivSucces.textContent = `Connexion réussie ! Bonjour ${result.user.prenom} `;
+                    alertDivSucces.classList.remove('hidden');
+
+                    // Masquer automatiquement après 3 secondes
+                    setTimeout(() => {
+                        alertDivSucces.classList.add('hidden');
+                        window.location.href = "app.php";
+                    }, 1500);
+                } else {
+                    // Afficher l'alerte erreur
+                    alertDiv.textContent = result.message;
+                    alertDiv.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                alertDiv.textContent = 'Erreur de connexion au serveur.'; // message serveur
+                alertDiv.classList.remove('hidden'); // afficher
+            } finally {
+                loadingButton.innerHTML = originalText;
+                loadingButton.disabled = false;
+            }
+        }
+
+
+        // Gestion de l'inscription
+        async function handleRegister(event) {
+            console.log('Cliquer')
+            event.preventDefault();
+
+            const firstName = document.getElementById('registerFirstName').value.trim();
+            const lastName = document.getElementById('registerLastName').value.trim();
+            const phone = document.getElementById('registerPhone').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            const sponsorId = document.getElementById('registerSponsorId').value.trim();
+            // const acceptTerms = document.getElementById('acceptTerms').checked;
+
+            // 🔹 Validations côté client
+            if (!firstName || !lastName || !phone || !password || !confirmPassword || !sponsorId) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Les mots de passe ne correspondent pas');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Le mot de passe doit contenir au moins 6 caractères');
+                return;
+            }
+
+            const phoneRegex = /^(032|033|034|038)\d{7}$/;
+            if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
+                alert('Format de numéro de téléphone invalide');
+                return;
+            }
+
+            // 🔹 Bouton en état "chargement"
+            const loadingButton = event.target.querySelector('button[type="submit"]');
+            const originalText = loadingButton.innerHTML;
+            loadingButton.innerHTML = '<i class="bi bi-hourglass-split mr-2"></i>Création du compte...';
+            loadingButton.disabled = true;
+
+            try {
+                // 🔹 Envoi au backend
+                const response = await fetch('register.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        nom: lastName,
+                        prenom: firstName,
+                        telephone: phone,
+                        mot_de_passe: password,
+                        confirm_mot_de_passe: confirmPassword,
+                        parrain_id: sponsorId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // alert(`Inscription réussie ! Bienvenue ${firstName} ${lastName} 🎉\nVotre ID: ${result.user_id}`);
+                    Swal.fire({
+                        title: '🎉 Inscription réussie !',
+                        html: `Bienvenue <b>${firstName} ${lastName}</b><br>Votre ID : <b>${result.user_id}</b>`,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#0ED584', // Vert
+                        background: '#FFFFFF', // Blanc
+                        color: '#000000', // Noir (texte)
                     });
+                    // Réinitialiser le formulaire et basculer vers login
+                    event.target.reset();
+                    document.getElementById('passwordStrength').classList.add('hidden');
+                    document.getElementById('passwordMatch').classList.add('hidden');
+                    document.getElementById('sponsorValidation').classList.add('hidden');
+                    showTab('login');
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de l\'inscription. Veuillez réessayer.');
+            } finally {
+                loadingButton.innerHTML = originalText;
+                loadingButton.disabled = false;
+            }
+        }
 
-                    const result = await response.json();
 
-                    if (result.success) {
-                        validationDiv.innerHTML =
-                            `<span class="text-green-600"><i class="bi bi-check-circle mr-1"></i>Parrain trouvé </span>`;
-                    } else {
-                        validationDiv.innerHTML =
-                            '<span class="text-red-600"><i class="bi bi-x-circle mr-1"></i>ID parrain non trouvé</span>';
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            // Validation du mot de passe en temps réel
+            const registerPassword = document.getElementById('registerPassword');
+            const registerConfirmPassword = document.getElementById('registerConfirmPassword');
+            const registerSponsorId = document.getElementById('registerSponsorId');
+
+            if (registerPassword) {
+                registerPassword.addEventListener('input', function () {
+                    checkPasswordStrength(this.value);
+                    if (registerConfirmPassword.value) {
+                        checkPasswordMatch();
+                    }
+                });
+            }
+
+            if (registerConfirmPassword) {
+                registerConfirmPassword.addEventListener('input', checkPasswordMatch);
+            }
+
+            if (registerSponsorId) {
+                registerSponsorId.addEventListener('input', function () {
+                    validateSponsorId(this.value);
+                });
+            }
+
+            // Formatage automatique du numéro de téléphone
+            const phoneInputs = document.querySelectorAll('input[type="tel"]');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    let value = this.value.replace(/\D/g, ''); // garder uniquement chiffres
+                    let formatted = '';
+
+                    if (value.length > 0) {
+                        formatted = value.substring(0, 3); // les 3 premiers
+                    }
+                    if (value.length > 3) {
+                        formatted += ' ' + value.substring(3, 5); // 2 chiffres
+                    }
+                    if (value.length > 5) {
+                        formatted += ' ' + value.substring(5, 8); // 3 chiffres
+                    }
+                    if (value.length > 8) {
+                        formatted += ' ' + value.substring(8, 10); // 2 chiffres
                     }
 
-                    validationDiv.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Erreur lors de la validation du parrain:', error);
-                    validationDiv.innerHTML =
-                        '<span class="text-red-600"><i class="bi bi-exclamation-triangle mr-1"></i>Erreur serveur</span>';
-                    validationDiv.classList.remove('hidden');
-                }
-            }, 500); // petit délai pour éviter trop de requêtes
-        } else {
-            validationDiv.classList.add('hidden');
-        }
-    }
-
-
-    // Gestion de la connexion
-    async function handleLogin(event) {
-        event.preventDefault();
-
-        const phone = document.getElementById('loginPhone').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-        const alertDiv = document.getElementById('alertError');
-        const alertDivSucces = document.getElementById('alertSuccess');
-
-        // Masquer l'alerte au début
-        alertDiv.classList.add('hidden');
-
-        if (!phone || !password) {
-            alertDiv.textContent = 'Veuillez remplir tous les champs';
-            alertDiv.classList.remove('hidden');
-            return;
-        }
-
-        const loadingButton = event.target.querySelector('button[type="submit"]');
-        const originalText = loadingButton.innerHTML;
-        loadingButton.innerHTML = '<i class="bi bi-hourglass-split mr-2"></i>Connexion...';
-        loadingButton.disabled = true;
-
-        try {
-            const response = await fetch('auth.php', {
-                method: 'POST',
-                body: new URLSearchParams({
-                    telephone: phone,
-                    mot_de_passe: password
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                // Masquer l'alerte d'erreur si elle est affichée
-                alertDiv.classList.add('hidden');
-
-                // Afficher l'alerte succès
-                alertDivSucces.textContent = `Connexion réussie ! Bonjour ${result.user.prenom} `;
-                alertDivSucces.classList.remove('hidden');
-
-                // Masquer automatiquement après 3 secondes
-                setTimeout(() => {
-                    alertDivSucces.classList.add('hidden');
-                    window.location.href = "app.php";
-                }, 1500);
-            } else {
-                // Afficher l'alerte erreur
-                alertDiv.textContent = result.message;
-                alertDiv.classList.remove('hidden');
-            }
-
-        } catch (error) {
-            console.error('Erreur:', error);
-            alertDiv.textContent = 'Erreur de connexion au serveur.'; // message serveur
-            alertDiv.classList.remove('hidden'); // afficher
-        } finally {
-            loadingButton.innerHTML = originalText;
-            loadingButton.disabled = false;
-        }
-    }
-
-
-    // Gestion de l'inscription
-    async function handleRegister(event) {
-        console.log('Cliquer')
-        event.preventDefault();
-
-        const firstName = document.getElementById('registerFirstName').value.trim();
-        const lastName = document.getElementById('registerLastName').value.trim();
-        const phone = document.getElementById('registerPhone').value.trim();
-        const password = document.getElementById('registerPassword').value;
-        const confirmPassword = document.getElementById('registerConfirmPassword').value;
-        const sponsorId = document.getElementById('registerSponsorId').value.trim();
-        // const acceptTerms = document.getElementById('acceptTerms').checked;
-
-        // 🔹 Validations côté client
-        if (!firstName || !lastName || !phone || !password || !confirmPassword || !sponsorId) {
-            alert('Veuillez remplir tous les champs obligatoires');
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            alert('Les mots de passe ne correspondent pas');
-            return;
-        }
-
-        if (password.length < 6) {
-            alert('Le mot de passe doit contenir au moins 6 caractères');
-            return;
-        }
-
-        const phoneRegex = /^(032|033|034|038)\d{7}$/;
-        if (!phoneRegex.test(phone.replace(/\s/g, ''))) {
-            alert('Format de numéro de téléphone invalide');
-            return;
-        }
-
-        // 🔹 Bouton en état "chargement"
-        const loadingButton = event.target.querySelector('button[type="submit"]');
-        const originalText = loadingButton.innerHTML;
-        loadingButton.innerHTML = '<i class="bi bi-hourglass-split mr-2"></i>Création du compte...';
-        loadingButton.disabled = true;
-
-        try {
-            // 🔹 Envoi au backend
-            const response = await fetch('register.php', {
-                method: 'POST',
-                body: new URLSearchParams({
-                    nom: lastName,
-                    prenom: firstName,
-                    telephone: phone,
-                    mot_de_passe: password,
-                    confirm_mot_de_passe: confirmPassword,
-                    parrain_id: sponsorId
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                // alert(`Inscription réussie ! Bienvenue ${firstName} ${lastName} 🎉\nVotre ID: ${result.user_id}`);
-                Swal.fire({
-                    title: '🎉 Inscription réussie !',
-                    html: `Bienvenue <b>${firstName} ${lastName}</b><br>Votre ID : <b>${result.user_id}</b>`,
-                    icon: 'success',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#0ED584', // Vert
-                    background: '#FFFFFF', // Blanc
-                    color: '#000000', // Noir (texte)
+                    this.value = formatted;
                 });
-                // Réinitialiser le formulaire et basculer vers login
-                event.target.reset();
-                document.getElementById('passwordStrength').classList.add('hidden');
-                document.getElementById('passwordMatch').classList.add('hidden');
-                document.getElementById('sponsorValidation').classList.add('hidden');
-                showTab('login');
-            } else {
-                alert(result.message);
-            }
-        } catch (error) {
-            console.error('Erreur:', error);
-            alert('Erreur lors de l\'inscription. Veuillez réessayer.');
-        } finally {
-            loadingButton.innerHTML = originalText;
-            loadingButton.disabled = false;
-        }
-    }
-
-
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-        // Validation du mot de passe en temps réel
-        const registerPassword = document.getElementById('registerPassword');
-        const registerConfirmPassword = document.getElementById('registerConfirmPassword');
-        const registerSponsorId = document.getElementById('registerSponsorId');
-
-        if (registerPassword) {
-            registerPassword.addEventListener('input', function() {
-                checkPasswordStrength(this.value);
-                if (registerConfirmPassword.value) {
-                    checkPasswordMatch();
-                }
             });
-        }
 
-        if (registerConfirmPassword) {
-            registerConfirmPassword.addEventListener('input', checkPasswordMatch);
-        }
 
-        if (registerSponsorId) {
-            registerSponsorId.addEventListener('input', function() {
-                validateSponsorId(this.value);
-            });
-        }
+            // Animation d'entrée
+            const container = document.querySelector('.max-w-md');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
 
-        // Formatage automatique du numéro de téléphone
-        const phoneInputs = document.querySelectorAll('input[type="tel"]');
-        phoneInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                let value = this.value.replace(/\D/g, ''); // garder uniquement chiffres
-                let formatted = '';
-
-                if (value.length > 0) {
-                    formatted = value.substring(0, 3); // les 3 premiers
-                }
-                if (value.length > 3) {
-                    formatted += ' ' + value.substring(3, 5); // 2 chiffres
-                }
-                if (value.length > 5) {
-                    formatted += ' ' + value.substring(5, 8); // 3 chiffres
-                }
-                if (value.length > 8) {
-                    formatted += ' ' + value.substring(8, 10); // 2 chiffres
-                }
-
-                this.value = formatted;
-            });
+            setTimeout(() => {
+                container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
         });
-
-
-        // Animation d'entrée
-        const container = document.querySelector('.max-w-md');
-        container.style.opacity = '0';
-        container.style.transform = 'translateY(20px)';
-
-        setTimeout(() => {
-            container.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            container.style.opacity = '1';
-            container.style.transform = 'translateY(0)';
-        }, 100);
-    });
     </script>
 
 </body>

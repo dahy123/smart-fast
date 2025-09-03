@@ -20,7 +20,7 @@ if ($pdo) {
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $user_fullname = $user['prenom'] . ' ' . $user['nom'];
-    $initiale=strtoupper(substr($user['prenom'],0,1));
+    $initiale = strtoupper(substr($user['prenom'], 0, 1));
     $user_phone = $user['telephone'];
     $user_creation_date = $user['date_inscription'];
 
@@ -62,28 +62,30 @@ if ($pdo) {
                        ORDER BY date_retrait DESC");
     $stmt->execute([$user_id]);
     $retraits_hist = $stmt->fetchAll(PDO::FETCH_ASSOC);
-   
-   // Récupérer le niveau actuel de l'utilisateur (niveau 0 par défaut)
-$stmt = $pdo->prepare("SELECT MAX(niveau_id) FROM investissements WHERE utilisateur_id = ?");
-$stmt->execute([$user_id]);
-$niveau_actuel = (int) $stmt->fetchColumn();
-if ($niveau_actuel === 0) $niveau_actuel = 0;
 
-// Récupérer le solde utilisateur (ex: somme des investissements ou autre logique)
-$stmt = $pdo->prepare("SELECT SUM(montant) FROM investissements WHERE utilisateur_id = ?");
-$stmt->execute([$user_id]);
-$solde_user = (float) $stmt->fetchColumn();
-if (!$solde_user) $solde_user = 0;
+    // Récupérer le niveau actuel de l'utilisateur (niveau 0 par défaut)
+    $stmt = $pdo->prepare("SELECT MAX(niveau_id) FROM investissements WHERE utilisateur_id = ?");
+    $stmt->execute([$user_id]);
+    $niveau_actuel = (int) $stmt->fetchColumn();
+    if ($niveau_actuel === 0)
+        $niveau_actuel = 0;
 
-// Récupérer le prochain niveau pour le calcul de progression
-$stmt = $pdo->prepare("SELECT * FROM niveaux WHERE niveau > ? ORDER BY niveau ASC LIMIT 1");
-$stmt->execute([$niveau_actuel]);
-$prochain_niveau = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Récupérer le solde utilisateur (ex: somme des investissements ou autre logique)
+    $stmt = $pdo->prepare("SELECT SUM(montant) FROM investissements WHERE utilisateur_id = ?");
+    $stmt->execute([$user_id]);
+    $solde_user = (float) $stmt->fetchColumn();
+    if (!$solde_user)
+        $solde_user = 0;
 
-// Calcul de la progression en pourcentage
-$next_price = $prochain_niveau ? (float) $prochain_niveau['investissement'] : 1;
-$progress = min(100, ($solde_user / $next_price) * 100);
-$restant = $prochain_niveau ? max(0, $next_price - $solde_user) : 0;
+    // Récupérer le prochain niveau pour le calcul de progression
+    $stmt = $pdo->prepare("SELECT * FROM niveaux WHERE niveau > ? ORDER BY niveau ASC LIMIT 1");
+    $stmt->execute([$niveau_actuel]);
+    $prochain_niveau = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Calcul de la progression en pourcentage
+    $next_price = $prochain_niveau ? (float) $prochain_niveau['investissement'] : 1;
+    $progress = min(100, ($solde_user / $next_price) * 100);
+    $restant = $prochain_niveau ? max(0, $next_price - $solde_user) : 0;
 
     // Récupérer les niveaux à parcourir (supérieurs au niveau actuel)
     $stmt = $pdo->prepare("SELECT * FROM niveaux WHERE niveau > ? ORDER BY niveau ASC");
@@ -93,6 +95,31 @@ $restant = $prochain_niveau ? max(0, $next_price - $solde_user) : 0;
     // Récupérer la structure des commissions (niveaux)
     $stmt = $pdo->query("SELECT * FROM niveaux ORDER BY niveau ASC");
     $structure_commissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Définition des avantages dynamiques
+    $avantages = [
+        1 => ['✓ Accès au tableau de bord', '✓ Dépôts et retraits', '✓ Bonus 100%'],
+        2 => ['✓ Toutes fonctions niveau 1', '✓ Parrainage niveau 1', '✓ Bonus 75%'],
+        3 => ['✓ Toutes fonctions niveau 2', '✓ Parrainage niveau 2', '✓ Bonus 50%',],
+        4 => ['✓ Toutes fonctions niveau 3', '✓ Parrainage niveau 3', '✓ Bonus 25%', '✓ Minage automatique'],
+    ];
+
+    // Fusionner chaque niveau avec ses avantages
+    // foreach ($structure_commissions as &$niveau) {
+    //     $id = (int) $niveau['niveau'];
+    //     $niveau['avantages'] = $avantages[$id] ?? [];
+    // }
+    // Comparaison de ses avantages
+    $features = [
+        "Parrainage" => [2, 2, 4, 8, 16],         // disponible dès niveau 2
+        "Bonus parrainage" => [
+            1 => "100%",
+            2 => "75%%",
+            3 => "50%",
+            4 => "25%"
+        ],
+        "Minage automatique" => [4],
+    ];
 
     // ID de parrainage (ex: SMRT-xxxxx)
     $stmt = $pdo->prepare("SELECT id, parrain_id FROM utilisateurs WHERE id = ?");
@@ -172,8 +199,8 @@ $restant = $prochain_niveau ? max(0, $next_price - $solde_user) : 0;
     // Lien de parrainage
     $lien_parrainage = "https://smart-mg.is-best.net/src/auth.php";
     $lien_admin = "https://smart-mg.is-best.net/src/admin/dashboard.php";
-    $lien_moderator = "https://smart-mg.is-best.net/src/admin/depot.php"; 
-    
+    $lien_moderator = "https://smart-mg.is-best.net/src/admin/depot.php";
+
     // Arbre de parrainage
     function getReferralTree($pdo, $user_id, $niveau = 1, $max_niveau = 5)
     {
@@ -336,7 +363,8 @@ $restant = $prochain_niveau ? max(0, $next_price - $solde_user) : 0;
     echo "Erreur de connexion à la base de données.";
 }
 
-function getAllInvestissements($pdo) {
+function getAllInvestissements($pdo)
+{
     $stmt = $pdo->query("
         SELECT i.id, i.utilisateur_id, u.nom, u.prenom, i.niveau_id, n.niveau, i.montant, i.date_investissement
         FROM investissements i
@@ -346,3 +374,27 @@ function getAllInvestissements($pdo) {
     ");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+// Exemple de construction d'un historique global
+$sql = "
+    SELECT 'Dépôt' as type, d.montant, d.date_depot as date, u.nom, u.prenom
+    FROM depots d
+    INNER JOIN utilisateurs u ON d.utilisateur_id = u.id
+
+    UNION ALL
+
+    SELECT 'Retrait' as type, r.montant, r.date_retrait as date, u.nom, u.prenom
+    FROM retraits r
+    INNER JOIN utilisateurs u ON r.utilisateur_id = u.id
+
+    UNION ALL
+
+    SELECT 'Investissement' as type, i.montant, i.date_investissement as date, u.nom, u.prenom
+    FROM investissements i
+    INNER JOIN utilisateurs u ON i.utilisateur_id = u.id
+
+    ORDER BY date DESC
+    LIMIT 7
+";
+$stmt = $pdo->query($sql);
+$historique_global = $stmt->fetchAll(PDO::FETCH_ASSOC);

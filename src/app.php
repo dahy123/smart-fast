@@ -71,10 +71,13 @@ require_once "../app/controller.php";
                 <div class="flex items-center space-x-4">
                     <span class="text-sm text-gray-700">Bienvenue,
                         <strong><?php echo htmlspecialchars($user_fullname); ?></strong></span>
-                    <!-- <button type="button" id="logoutBtn"
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
-                        <i class="bi bi-box-arrow-right mr-1"></i>Déconnexion
-                    </button> -->
+
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                        <a href="admin.php"
+                            class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center">
+                            <i class="bi bi-gear mr-1"></i>Administration
+                        </a>
+                    <?php endif; ?>
                     <a href="logout.php"
                         class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm inline-flex items-center">
                         <i class="bi bi-box-arrow-right mr-1"></i>Déconnexion
@@ -90,7 +93,13 @@ require_once "../app/controller.php";
             <h1 class="text-xl font-bold text-primary">SMART-FAST</h1>
 
             <!-- User profile & dropdown -->
-            <div class="relative inline-block text-left">
+            <div class="relative inline-block text-left flex items-center space-x-2">
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                    <a href="admin.php"
+                        class="bg-gray-800 hover:bg-gray-900 text-white px-2 py-1 rounded-full text-sm inline-flex items-center">
+                        <i class="bi bi-gear text-2xl"></i>
+                    </a>
+                <?php endif; ?>
                 <button id="userDropdownBtn" class="flex items-center focus:outline-none">
                     <div
                         class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-2">
@@ -104,6 +113,7 @@ require_once "../app/controller.php";
 
                 <div id="userDropdown"
                     class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+
                     <div class="py-1">
                         <form action="logout.php" method="POST">
                             <button type="submit"
@@ -229,30 +239,64 @@ require_once "../app/controller.php";
             </div>
 
             <!-- Historique Récent -->
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <div class="flex justify-between items-center mb-4">
+            <div class="bg-white rounded-xl p-4 shadow-md">
+                <div class="flex justify-between items-center mb-3">
                     <h3 class="text-lg font-semibold text-gray-900">Historique récent</h3>
-                    <button class="text-primary hover:text-primary-dark text-sm font-medium">Voir tout</button>
+                    <a href="historique.php" class="text-primary hover:text-primary-dark text-sm font-medium">Voir
+                        tout</a>
                 </div>
-                <div class="space-y-4">
-                    <?php foreach ($depots_valides as $depot): ?>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center">
-                                <div class="bg-green-100 p-2 rounded-lg">
-                                    <i class="bi bi-plus-circle text-primary"></i>
+
+                <div class="space-y-3">
+                    <?php if (!empty($historique_global)): ?>
+                        <?php foreach ($historique_global as $histo): ?>
+                            <?php
+                            switch ($histo['type']) {
+                                case 'Dépôt':
+                                    $bg = 'bg-green-100';
+                                    $icon = 'bi-plus-circle text-green-600';
+                                    $sign = '+';
+                                    break;
+                                case 'Retrait':
+                                    $bg = 'bg-red-100';
+                                    $icon = 'bi-dash-circle text-red-600';
+                                    $sign = '-';
+                                    break;
+                                case 'Investissement':
+                                    $bg = 'bg-blue-100';
+                                    $icon = 'bi-graph-up-arrow text-blue-600';
+                                    $sign = '-';
+                                    break;
+                                default:
+                                    $bg = 'bg-gray-100';
+                                    $icon = 'bi-clock text-gray-600';
+                                    $sign = '';
+                            }
+                            ?>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg flex-wrap">
+                                <div class="flex items-center space-x-3 flex-1 min-w-0">
+                                    <div class="<?= $bg ?> p-2 rounded-lg flex-shrink-0">
+                                        <i class="bi <?= $icon ?>"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <p class="font-medium text-gray-900 truncate">
+                                            <?= $histo['type'] ?>
+                                            <span class="text-sm text-gray-500">
+                                                (<?= htmlspecialchars($histo['prenom'] . ' ' . $histo['nom']) ?>)
+                                            </span>
+                                        </p>
+                                        <p class="text-sm text-gray-600 truncate">
+                                            <?= date('d M, H:i', strtotime($histo['date'])) ?>
+                                        </p>
+                                    </div>
                                 </div>
-                                <div class="ml-3">
-                                    <p class="font-medium text-gray-900">Dépôt</p>
-                                    <p class="text-sm text-gray-600">
-                                        <?= date('d M, H:i', strtotime($depot['date_depot'])) ?>
-                                    </p>
-                                </div>
+                                <span class="font-semibold text-gray-900 ml-3 flex-shrink-0">
+                                    <?= $sign ?>         <?= number_format($histo['montant'], 0, '', ' ') ?> Ar
+                                </span>
                             </div>
-                            <span class="font-semibold text-primary">+<?= number_format($depot['montant'], 0, '', ' ') ?>
-                                Ar</span>
-                        </div>
-                    <?php endforeach; ?>
-                    <!-- On peut ajouter retraits récents de même manière -->
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-sm text-gray-500">Aucune activité récente.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -282,11 +326,11 @@ require_once "../app/controller.php";
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-blue-700 font-medium">Nom du compte:</p>
-                            <p class="text-blue-900 font-bold">RAMIZAKA</p>
+                            <p class="text-blue-900 font-bold">ZAFINDRAVO</p>
                         </div>
                         <div>
                             <p class="text-sm text-blue-700 font-medium">Numéro de compte:</p>
-                            <p class="text-blue-900 font-bold">032 27 435 67</p>
+                            <p class="text-blue-900 font-bold">032 93 751 54</p>
                         </div>
                     </div>
                     <div class="mt-3 p-3 bg-white rounded border border-blue-200">
@@ -297,7 +341,6 @@ require_once "../app/controller.php";
                         </p>
                     </div>
                 </div>
-
                 <!-- Dépôt rapide -->
                 <div class="bg-green-50 rounded-lg p-4 mb-6 border border-green-200">
                     <h3 class="font-semibold text-green-900 mb-3 flex items-center">
@@ -308,15 +351,15 @@ require_once "../app/controller.php";
                             <label class="text-sm font-medium text-green-700">Montant:</label>
                             <input type="number" id="quickDepositAmount"
                                 class="px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent w-32"
-                                placeholder="1000" min="1000">
+                                placeholder="1000" min="1000" oninput="updateUSSDCode()">
                             <span class="text-green-700">Ar</span>
                         </div>
                         <div class="bg-white p-3 rounded border border-green-200">
                             <p class="text-sm text-green-700 mb-2">Code USSD généré:</p>
                             <div class="flex items-center space-x-2">
                                 <code id="ussdCode"
-                                    class="bg-gray-100 px-3 py-2 rounded text-sm font-mono flex-1">#144*1*1*032274356*0322743567*1000#</code>
-                                <button onclick="copyUSSDCode()"
+                                    class="bg-gray-100 px-3 py-2 rounded text-sm font-mono flex-1">#144*1*1*0329375154*0329375154*1000*2#</code>
+                                <button onclick="copyUSSDCode(event)"
                                     class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm">
                                     <i class="bi bi-copy"></i>
                                 </button>
@@ -328,6 +371,39 @@ require_once "../app/controller.php";
                         </button>
                     </div>
                 </div>
+                <script>
+                    // Fonctions pour le dépôt rapide
+                    function updateUSSDCode() {
+                        const amount = document.getElementById('quickDepositAmount').value || '1000';
+                        const ussdCode = `#144*1*1*0329375154*0329375154*${amount}*2#`;
+                        document.getElementById('ussdCode').textContent = ussdCode;
+                    }
+
+                    function copyUSSDCode(event) {
+                        const code = document.getElementById('ussdCode').textContent;
+                        navigator.clipboard.writeText(code).then(() => {
+                            const button = event.target.closest('button');
+                            const originalHTML = button.innerHTML;
+                            button.innerHTML = '<i class="bi bi-check"></i>';
+                            button.classList.add('bg-green-700');
+
+                            setTimeout(() => {
+                                button.innerHTML = originalHTML;
+                                button.classList.remove('bg-green-700');
+                            }, 2000);
+                        });
+                    }
+
+                    function callUSSD() {
+                        const code = document.getElementById('ussdCode').textContent;
+                        // Simuler l'appel USSD
+                        if (confirm(`Voulez-vous composer le code USSD :\n${code}`)) {
+                            alert('Redirection vers l\'application téléphone...');
+                            // Dans une vraie application mobile, ceci ouvrirait le dialer
+                            // window.location.href = `tel:${encodeURIComponent(code)}`;
+                        }
+                    }
+                </script>
 
                 <!-- Formulaire de dépôt -->
                 <form id="depositForm" class="space-y-6">
@@ -504,624 +580,151 @@ require_once "../app/controller.php";
                     <div class="flex items-center justify-between">
                         <span class="text-gray-600">Solde disponible:</span>
                         <span class="text-xl font-bold text-primary"
-                            id="userBalance"><?= number_format($solde_user, 0, ',', ' ') ?> Ar</span>
+                            id="userBalance"><?= number_format($balance, 0, ',', ' ') ?> Ar</span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">Montant minimum de retrait: 5 000 Ar</p>
                 </div>
 
                 <!-- Formulaire de retrait -->
                 <form id="withdrawForm" class="space-y-6">
+                    <!-- Montant -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Montant du retrait</label>
                         <div class="relative">
-                            <input type="number" id="withdrawAmount"
+                            <input type="number" id="withdrawAmount" name="amount"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="Entrez le montant" min="5000" max="125450">
+                                placeholder="Entrez le montant" min="5000" required>
                             <span class="absolute right-3 top-3 text-gray-500">Ar</span>
                         </div>
                     </div>
 
+                    <!-- Méthode -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Méthode de retrait</label>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label
-                                class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                <input type="radio" name="withdrawMethod" value="mobile"
-                                    class="text-primary focus:ring-primary">
-                                <div class="ml-3">
-                                    <div class="flex items-center">
-                                        <i class="bi bi-phone text-blue-600 text-xl mr-2"></i>
-                                        <span class="font-medium">Mobile Money</span>
-                                    </div>
-                                    <p class="text-sm text-gray-500">Frais: 2%</p>
-                                </div>
-                            </label>
-                        </div>
+                        <label
+                            class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" name="method" value="mobile" required
+                                class="text-primary focus:ring-primary">
+                            <div class="ml-3 flex items-center">
+                                <i class="bi bi-phone text-blue-600 text-xl mr-2"></i>
+                                <span class="font-medium">Mobile Money</span>
+                            </div>
+                        </label>
                     </div>
 
+                    <!-- Numéro de téléphone -->
                     <div id="withdrawMobileDetails" class="hidden">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Numéro de téléphone</label>
-                        <input type="tel"
+                        <input type="tel" name="phone"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="034 XX XXX XX">
                     </div>
 
-                    <!-- Récapitulatif -->
-                    <div id="withdrawSummary" class="bg-gray-50 rounded-lg p-4 hidden">
-                        <h4 class="font-medium text-gray-900 mb-2">Récapitulatif</h4>
-                        <div class="space-y-1 text-sm">
-                            <div class="flex justify-between">
-                                <span>Montant demandé:</span>
-                                <span id="requestedAmount">0 Ar</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Frais:</span>
-                                <span id="withdrawFees">0 Ar</span>
-                            </div>
-                            <div class="flex justify-between font-medium border-t pt-1">
-                                <span>Montant à recevoir:</span>
-                                <span id="finalAmount">0 Ar</span>
-                            </div>
-                        </div>
-                    </div>
-
+                    <!-- Bouton -->
                     <button type="submit"
                         class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-6 rounded-lg font-semibold transition-colors">
                         <i class="bi bi-dash-circle mr-2"></i>Demander le retrait
                     </button>
                 </form>
+
             </div>
 
-            <!-- Historique des retraits -->
+            <!-- Historique de retrait -->
             <div class="bg-white rounded-xl p-6 shadow-md">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Historique des retraits</h3>
+
                 <div class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                        <div>
-                            <p class="font-medium text-gray-900">25 000 Ar</p>
-                            <p class="text-sm text-gray-600">Mobile Money - Aujourd'hui 09:15</p>
-                        </div>
-                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">En
-                            cours</span>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
-                        <div>
-                            <p class="font-medium text-gray-900">50 000 Ar</p>
-                            <p class="text-sm text-gray-600">Virement bancaire - 2 jours 14:30</p>
-                        </div>
-                        <span
-                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Terminé</span>
-                    </div>
-                    <div class="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
-                        <div>
-                            <p class="font-medium text-gray-900">15 000 Ar</p>
-                            <p class="text-sm text-gray-600">Mobile Money - 5 jours 11:20</p>
-                        </div>
-                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">Annulé</span>
-                    </div>
+                    <?php if (!empty($retraits_hist)): ?>
+                        <?php foreach ($retraits_hist as $retrait): ?>
+                            <?php
+                            // Définir le style selon le statut
+                            switch ($retrait['statut']) {
+                                case 'valide':
+                                    $bg = 'bg-green-50 border-green-200';
+                                    $badge = 'bg-green-100 text-green-800';
+                                    $statut_label = 'Terminé';
+                                    break;
+                                case 'en_attente':
+                                    $bg = 'bg-yellow-50 border-yellow-200';
+                                    $badge = 'bg-yellow-100 text-yellow-800';
+                                    $statut_label = 'En cours';
+                                    break;
+                                case 'annule':
+                                    $bg = 'bg-red-50 border-red-200';
+                                    $badge = 'bg-red-100 text-red-800';
+                                    $statut_label = 'Annulé';
+                                    break;
+                                default:
+                                    $bg = 'bg-gray-50 border-gray-200';
+                                    $badge = 'bg-gray-100 text-gray-800';
+                                    $statut_label = ucfirst($retrait['statut']);
+                            }
+                            ?>
+                            <div class="flex items-center justify-between p-4 rounded-lg border <?= $bg ?>">
+                                <div>
+                                    <p class="font-medium text-gray-900"><?= number_format($retrait['montant'], 0, ',', ' ') ?>
+                                        Ar</p>
+                                    <p class="text-sm text-gray-600">
+                                        <?= htmlspecialchars($retrait['methode']) ?> -
+                                        <?= date('d/m/Y H:i', strtotime($retrait['date_retrait'])) ?>
+                                    </p>
+                                </div>
+                                <span class="<?= $badge ?> px-3 py-1 rounded-full text-sm font-medium">
+                                    <?= $statut_label ?>
+                                </span>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-gray-500 text-sm">Aucun retrait effectué pour le moment.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
-            <!-- Historique des retraits -->
-            <div class="space-y-4" id="withdrawHistory">
-                <?php foreach ($retraits_hist as $retrait): ?>
-                    <?php
-                    $bg = 'bg-yellow-50 border-yellow-200 text-yellow-800'; // en cours
-                    if ($retrait['statut'] === 'valide') {
-                        $bg = 'bg-green-50 border-green-200 text-green-800';
-                    } elseif ($retrait['statut'] === 'annule') {
-                        $bg = 'bg-red-50 border-red-200 text-red-800';
+
+
+        </main>
+    </div>
+
+    <script>
+        // Soumission AJAX du formulaire de retrait
+        document.getElementById('withdrawForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+
+            fetch('<?= $baseUrl ?? "" ?>retrait.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    showAlert(data.success ? 'success' : 'error', data.message);
+
+                    if (data.success) {
+                        // Mise à jour du solde si présent
+                        if (document.getElementById('userBalance')) {
+                            document.getElementById('userBalance').textContent = data.newBalance + ' Ar';
+                        }
+
+                        // Réinitialiser le formulaire
+                        this.reset();
+
+                        // Masquer le récapitulatif
+                        document.getElementById('withdrawSummary').classList.add('hidden');
+
+                        // Optionnel : recharger dynamiquement
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000);
                     }
-                    $methode = ucfirst($retrait['methode']);
-                    $date = date('d/m/Y H:i', strtotime($retrait['date_retrait']));
-                    ?>
-                    <div class="flex items-center justify-between p-4 rounded-lg border <?= $bg ?>">
-                        <div>
-                            <p class="font-medium text-gray-900"><?= number_format($retrait['montant'], 0, ',', ' ') ?> Ar
-                            </p>
-                            <p class="text-sm text-gray-600"><?= $methode ?> - <?= $date ?></p>
-                        </div>
-                        <span class="px-3 py-1 rounded-full text-sm font-medium">
-                            <?= $retrait['statut'] === 'valide' ? 'Terminé' : ($retrait['statut'] === 'annule' ? 'Annulé' : 'En cours') ?>
-                        </span>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </main>
-    </div>
+                })
+                .catch(err => {
+                    console.error(err);
+                    showAlert('error', 'Erreur serveur');
+                });
+        });
+    </script>
 
-    <!-- PAGE PARRAINAGE -->
-    <div id="" class="page-content hidden">
-        <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
-            <!-- Statistiques parrainage -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <div class="flex items-center">
-                        <div class="bg-blue-100 p-3 rounded-lg">
-                            <i class="bi bi-people text-blue-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Total filleuls</p>
-                            <p class="text-2xl font-bold text-gray-900">24</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <div class="flex items-center">
-                        <div class="bg-green-100 p-3 rounded-lg">
-                            <i class="bi bi-cash-coin text-primary text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Gains totaux</p>
-                            <p class="text-2xl font-bold text-gray-900">45 600 Ar</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <div class="flex items-center">
-                        <div class="bg-purple-100 p-3 rounded-lg">
-                            <i class="bi bi-graph-up text-purple-600 text-xl"></i>
-                        </div>
-                        <div class="ml-4">
-                            <p class="text-gray-600 text-sm">Ce mois</p>
-                            <p class="text-2xl font-bold text-gray-900">8 500 Ar</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Lien de parrainage -->
-            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Votre lien de parrainage</h3>
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1">
-                        <input type="text" id="referralLink" value="https://smart-mg.com/ref/JD2024" readonly
-                            class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-700">
-                    </div>
-                    <button onclick="copyReferralLink()"
-                        class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-lg font-medium">
-                        <i class="bi bi-copy mr-2"></i>Copier
-                    </button>
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium">
-                        <i class="bi bi-share mr-2"></i>Partager
-                    </button>
-                </div>
-                <p class="text-sm text-gray-600 mt-2">Gagnez 5% sur chaque dépôt de vos filleuls</p>
-            </div>
-
-            <!-- Structure de parrainage -->
-            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Structure de commission</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                        <div
-                            class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span class="font-bold">1</span>
-                        </div>
-                        <p class="font-medium text-gray-900">Niveau 1</p>
-                        <p class="text-primary font-bold">5%</p>
-                        <p class="text-sm text-gray-600">Filleuls directs</p>
-                    </div>
-                    <div class="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <div
-                            class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span class="font-bold">2</span>
-                        </div>
-                        <p class="font-medium text-gray-900">Niveau 2</p>
-                        <p class="text-blue-600 font-bold">3%</p>
-                        <p class="text-sm text-gray-600">Filleuls indirects</p>
-                    </div>
-                    <div class="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                        <div
-                            class="bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span class="font-bold">3</span>
-                        </div>
-                        <p class="font-medium text-gray-900">Niveau 3</p>
-                        <p class="text-purple-600 font-bold">1%</p>
-                        <p class="text-sm text-gray-600">Bonus spécial</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Hiérarchie des affiliations -->
-            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Hiérarchie de votre réseau</h3>
-                <div class="overflow-x-auto">
-                    <div class="min-w-full">
-                        <!-- Vous (racine) -->
-                        <div class="flex flex-col items-center mb-8">
-                            <div class="bg-primary text-white px-6 py-3 rounded-lg font-bold text-center">
-                                <div class="text-sm">VOUS</div>
-                                <div class="text-xs opacity-80">ID: JD2024</div>
-                            </div>
-
-                            <!-- Niveau 1 -->
-                            <div class="w-px h-8 bg-gray-300 my-2"></div>
-                            <div class="flex space-x-8">
-                                <!-- Filleul 1 -->
-                                <div class="flex flex-col items-center">
-                                    <div class="bg-blue-600 text-white px-4 py-2 rounded-lg text-center">
-                                        <div class="text-sm font-medium">Marie R.</div>
-                                        <div class="text-xs opacity-80">ID: MR001</div>
-                                    </div>
-
-                                    <!-- Sous-filleuls de Marie -->
-                                    <div class="w-px h-6 bg-gray-300 my-2"></div>
-                                    <div class="flex space-x-4">
-                                        <div class="bg-green-500 text-white px-3 py-2 rounded text-center">
-                                            <div class="text-xs font-medium">Paul A.</div>
-                                            <div class="text-xs opacity-80">PA001</div>
-                                        </div>
-                                        <div class="bg-green-500 text-white px-3 py-2 rounded text-center">
-                                            <div class="text-xs font-medium">Lisa M.</div>
-                                            <div class="text-xs opacity-80">LM001</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Filleul 2 -->
-                                <div class="flex flex-col items-center">
-                                    <div class="bg-blue-600 text-white px-4 py-2 rounded-lg text-center">
-                                        <div class="text-sm font-medium">Jean K.</div>
-                                        <div class="text-xs opacity-80">ID: JK002</div>
-                                    </div>
-
-                                    <!-- Sous-filleuls de Jean -->
-                                    <div class="w-px h-6 bg-gray-300 my-2"></div>
-                                    <div class="flex space-x-4">
-                                        <div class="bg-green-500 text-white px-3 py-2 rounded text-center">
-                                            <div class="text-xs font-medium">Sophie F.</div>
-                                            <div class="text-xs opacity-80">SF001</div>
-                                        </div>
-                                        <div class="bg-gray-400 text-white px-3 py-2 rounded text-center">
-                                            <div class="text-xs font-medium">Libre</div>
-                                            <div class="text-xs opacity-80">---</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Légende -->
-                        <div class="flex justify-center space-x-6 text-sm">
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-primary rounded mr-2"></div>
-                                <span>Vous</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-blue-600 rounded mr-2"></div>
-                                <span>Niveau 1 (max 2)</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-green-500 rounded mr-2"></div>
-                                <span>Niveau 2 (max 2 chacun)</span>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 bg-gray-400 rounded mr-2"></div>
-                                <span>Place libre</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Affiliations par niveau -->
-            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Affiliations par niveau</h3>
-
-                <!-- Onglets -->
-                <div class="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg">
-                    <button onclick="showLevelTab(1)"
-                        class="level-tab flex-1 py-2 px-4 rounded-md text-sm font-medium bg-primary text-white">
-                        Niveau 1 <span class="ml-1 bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">2</span>
-                    </button>
-                    <button onclick="showLevelTab(2)"
-                        class="level-tab flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900">
-                        Niveau 2 <span class="ml-1 bg-gray-200 px-2 py-1 rounded-full text-xs">3</span>
-                    </button>
-                    <button onclick="showLevelTab(3)"
-                        class="level-tab flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900">
-                        Niveau 3 <span class="ml-1 bg-gray-200 px-2 py-1 rounded-full text-xs">1</span>
-                    </button>
-                    <button onclick="showLevelTab(4)"
-                        class="level-tab flex-1 py-2 px-4 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900">
-                        Niveau 4 <span class="ml-1 bg-gray-200 px-2 py-1 rounded-full text-xs">0</span>
-                    </button>
-                </div>
-
-                <!-- Contenu Niveau 1 -->
-                <div id="level-1-content" class="level-content">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center">
-                                    <div
-                                        class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">
-                                        MR
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="font-medium text-gray-900">Marie Rakoto</p>
-                                        <p class="text-sm text-gray-500">ID: MR001</p>
-                                    </div>
-                                </div>
-                                <span
-                                    class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Actif</span>
-                            </div>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Inscrit le:</span>
-                                    <span>15/01/2024</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Dépôts totaux:</span>
-                                    <span class="font-medium">125 000 Ar</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Vos gains:</span>
-                                    <span class="font-bold text-primary">6 250 Ar</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Sous-filleuls:</span>
-                                    <span class="font-medium">2/2</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center">
-                                    <div
-                                        class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">
-                                        JK
-                                    </div>
-                                    <div class="ml-3">
-                                        <p class="font-medium text-gray-900">Jean Koto</p>
-                                        <p class="text-sm text-gray-500">ID: JK002</p>
-                                    </div>
-                                </div>
-                                <span
-                                    class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Actif</span>
-                            </div>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Inscrit le:</span>
-                                    <span>20/01/2024</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Dépôts totaux:</span>
-                                    <span class="font-medium">75 000 Ar</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Vos gains:</span>
-                                    <span class="font-bold text-primary">3 750 Ar</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Sous-filleuls:</span>
-                                    <span class="font-medium">1/2</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contenu Niveau 2 -->
-                <div id="level-2-content" class="level-content hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center">
-                                    <div
-                                        class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">
-                                        PA
-                                    </div>
-                                    <div class="ml-2">
-                                        <p class="font-medium text-gray-900 text-sm">Paul Andry</p>
-                                        <p class="text-xs text-gray-500">Parrain: Marie R.</p>
-                                    </div>
-                                </div>
-                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Actif</span>
-                            </div>
-                            <div class="text-xs space-y-1">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Dépôts:</span>
-                                    <span class="font-medium">50 000 Ar</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Vos gains:</span>
-                                    <span class="font-bold text-primary">1 500 Ar</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center">
-                                    <div
-                                        class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">
-                                        LM
-                                    </div>
-                                    <div class="ml-2">
-                                        <p class="font-medium text-gray-900 text-sm">Lisa Martin</p>
-                                        <p class="text-xs text-gray-500">Parrain: Marie R.</p>
-                                    </div>
-                                </div>
-                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Actif</span>
-                            </div>
-                            <div class="text-xs space-y-1">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Dépôts:</span>
-                                    <span class="font-medium">30 000 Ar</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Vos gains:</span>
-                                    <span class="font-bold text-primary">900 Ar</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center">
-                                    <div
-                                        class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold">
-                                        SF
-                                    </div>
-                                    <div class="ml-2">
-                                        <p class="font-medium text-gray-900 text-sm">Sophie Faly</p>
-                                        <p class="text-xs text-gray-500">Parrain: Jean K.</p>
-                                    </div>
-                                </div>
-                                <span
-                                    class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">Inactif</span>
-                            </div>
-                            <div class="text-xs space-y-1">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Dépôts:</span>
-                                    <span class="font-medium">0 Ar</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-600">Vos gains:</span>
-                                    <span class="font-bold text-gray-400">0 Ar</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Contenu Niveau 3 -->
-                <div id="level-3-content" class="level-content hidden">
-                    <div class="text-center py-8">
-                        <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="bi bi-people text-purple-600 text-2xl"></i>
-                        </div>
-                        <p class="text-gray-600 mb-2">1 affiliation de niveau 3</p>
-                        <p class="text-sm text-gray-500">Bonus spécial: 1% sur leurs dépôts</p>
-                    </div>
-                </div>
-
-                <!-- Contenu Niveau 4 -->
-                <div id="level-4-content" class="level-content hidden">
-                    <div class="text-center py-8">
-                        <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="bi bi-people text-gray-400 text-2xl"></i>
-                        </div>
-                        <p class="text-gray-600 mb-2">Aucune affiliation de niveau 4</p>
-                        <p class="text-sm text-gray-500">Développez votre réseau pour atteindre ce niveau</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Liste des filleuls -->
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Tous les filleuls</h3>
-                    <div class="flex space-x-2">
-                        <button class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg">Tous</button>
-                        <button class="text-sm bg-primary text-white px-3 py-1 rounded-lg">Actifs</button>
-                        <button class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg">Inactifs</button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Filleul</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date
-                                    d'inscription</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Niveau</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dépôts
-                                    totaux</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vos gains
-                                </th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-4 py-4">
-                                    <div class="flex items-center">
-                                        <div
-                                            class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
-                                            MR
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="font-medium text-gray-900">Marie Rakoto</p>
-                                            <p class="text-sm text-gray-500">marie.r@email.com</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-sm text-gray-600">15/01/2024</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Niveau
-                                        2</span>
-                                </td>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-900">125 000 Ar</td>
-                                <td class="px-4 py-4 text-sm font-bold text-primary">6 250 Ar</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Actif</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-4">
-                                    <div class="flex items-center">
-                                        <div
-                                            class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
-                                            PA
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="font-medium text-gray-900">Paul Andry</p>
-                                            <p class="text-sm text-gray-500">paul.a@email.com</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-sm text-gray-600">20/01/2024</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">Niveau
-                                        1</span>
-                                </td>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-900">75 000 Ar</td>
-                                <td class="px-4 py-4 text-sm font-bold text-primary">3 750 Ar</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Actif</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-4">
-                                    <div class="flex items-center">
-                                        <div
-                                            class="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium">
-                                            SF
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="font-medium text-gray-900">Sophie Faly</p>
-                                            <p class="text-sm text-gray-500">sophie.f@email.com</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-4 text-sm text-gray-600">25/01/2024</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">Niveau
-                                        0</span>
-                                </td>
-                                <td class="px-4 py-4 text-sm font-medium text-gray-900">0 Ar</td>
-                                <td class="px-4 py-4 text-sm font-bold text-gray-400">0 Ar</td>
-                                <td class="px-4 py-4">
-                                    <span
-                                        class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">Inactif</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-    </div>
     <!-- PAGE PARRAINAGE -->
     <div id="referral-page" class="page-content">
         <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
@@ -1135,7 +738,8 @@ require_once "../app/controller.php";
                         </div>
                         <div class="ml-4">
                             <p class="text-gray-600 text-sm">Total filleuls</p>
-                            <p class="text-2xl font-bold text-gray-900"><?= $filleuls_directs ?></p>
+                            <p class="text-2xl font-bold text-gray-900"><?= $filleuls_directs ?>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1161,7 +765,7 @@ require_once "../app/controller.php";
                         </div>
                         <div class="ml-4">
                             <p class="text-gray-600 text-sm">Ce mois</p>
-                            <p class="text-2xl font-bold text-gray-900"><?= number_format($solde_user, 0, ',', ' ') ?>
+                            <p class="text-2xl font-bold text-gray-900"><?= number_format($balance, 0, ',', ' ') ?>
                                 Ar</p>
                         </div>
                     </div>
@@ -1188,66 +792,59 @@ require_once "../app/controller.php";
             </div>
 
             <!-- Structure de commission -->
-            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
+            <!-- <div class="bg-white rounded-xl p-6 shadow-md mb-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Structure de commission</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <?php foreach ($structure_commissions as $niveau): ?>
                         <?php
                         // Définition des couleurs selon le niveau
                         $colors = [
-                            1 => ['bg' => 'bg-green-50', 'circle' => 'bg-primary text-white', 'border' => 'border-green-200', 'text' => 'text-primary'],
-                            2 => ['bg' => 'bg-blue-50', 'circle' => 'bg-blue-600 text-white', 'border' => 'border-blue-200', 'text' => 'text-blue-600'],
-                            3 => ['bg' => 'bg-purple-50', 'circle' => 'bg-purple-600 text-white', 'border' => 'border-purple-200', 'text' => 'text-purple-600'],
+                            1 => [
+                                'bg' => 'bg-green-50',
+                                'circle' => 'bg-primary text-white',
+                                'border' => 'border-green-200',
+                                'text' => 'text-primary'
+                            ],
+                            2 => [
+                                'bg' => 'bg-blue-50',
+                                'circle' => 'bg-blue-600 text-white',
+                                'border' => 'border-blue-200',
+                                'text' => 'text-blue-600'
+                            ],
+                            3 => [
+                                'bg' => 'bg-purple-50',
+                                'circle' => 'bg-purple-600 text-white',
+                                'border' => 'border-purple-200',
+                                'text' => 'text-purple-600'
+                            ],
+                            4 => [
+                                'bg' => 'bg-yellow-50',
+                                'circle' => 'bg-yellow-500 text-white',
+                                'border' => 'border-yellow-200',
+                                'text' => 'text-yellow-600'
+                            ],
                         ];
+
                         $c = $colors[$niveau['niveau']] ?? ['bg' => 'bg-gray-50', 'circle' => 'bg-gray-600 text-white', 'border' => 'border-gray-200', 'text' => 'text-gray-600'];
-                        ?>
+                        $descptions = ["Filleuls directs", 'Filleuls indirects',];
+                        $pourcentage = [100, 75, 50, 25]
+                            ?>
                         <div class="text-center p-4 <?= $c['bg'] ?> rounded-lg border <?= $c['border'] ?>">
                             <div
                                 class="<?= $c['circle'] ?> w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
                                 <span class="font-bold"><?= $niveau['niveau'] ?></span>
                             </div>
                             <p class="font-medium text-gray-900">Niveau <?= $niveau['niveau'] ?></p>
-                            <p class="<?= $c['text'] ?> font-bold"><?= $niveau['pourcentage'] ?>%</p>
-                            <p class="text-sm text-gray-600"><?= $niveau['description'] ?></p>
+                            <p class="<?= $c['text'] ?> font-bold">
+                                <?= ($niveau['niveau'] == 1) ? $pourcentage[0] : (($niveau['niveau'] == 2) ? $pourcentage[1] : $pourcentage[2]) ?>%
+                            </p>
+                            <p class="text-sm text-gray-600">
+                                <?= ($niveau['niveau'] == 1) ? $descptions[0] : $descptions[1] ?>
+                            </p>
                         </div>
                     <?php endforeach; ?>
                 </div>
-            </div>
-
-
-            <div class="bg-white rounded-xl p-6 shadow-md mb-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Structure de commission</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                        <div
-                            class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span class="font-bold">1</span>
-                        </div>
-                        <p class="font-medium text-gray-900">Niveau 1</p>
-                        <p class="text-primary font-bold">5%</p>
-                        <p class="text-sm text-gray-600">Filleuls directs</p>
-                    </div>
-                    <div class="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <div
-                            class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span class="font-bold">2</span>
-                        </div>
-                        <p class="font-medium text-gray-900">Niveau 2</p>
-                        <p class="text-blue-600 font-bold">3%</p>
-                        <p class="text-sm text-gray-600">Filleuls indirects</p>
-                    </div>
-                    <div class="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                        <div
-                            class="bg-purple-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <span class="font-bold">3</span>
-                        </div>
-                        <p class="font-medium text-gray-900">Niveau 3</p>
-                        <p class="text-purple-600 font-bold">1%</p>
-                        <p class="text-sm text-gray-600">Bonus spécial</p>
-                    </div>
-                </div>
-            </div>
-
+            </div> -->
 
             <!-- Arbre de parrainage -->
             <div class="bg-white rounded-xl p-6 shadow-md mb-6">
@@ -1311,7 +908,7 @@ require_once "../app/controller.php";
                                     totaux</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vos gains
                                 </th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                                <!-- <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th> -->
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -1410,104 +1007,57 @@ require_once "../app/controller.php";
             <!-- Liste des niveaux -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <?php
-                // Définition des avantages fixes pour les niveaux 1 à 3
-                $avantages = [
-                    1 => [
-                        '✓ Accès au tableau de bord',
-                        '✓ Dépôts et retraits',
-                        '✓ Support client'
-                    ],
-                    2 => [
-                        '✓ Toutes fonctions niveau 1',
-                        '✓ Parrainage niveau 1',
-                        '✓ Bonus 3%'
-                    ],
-                    3 => [
-                        '✓ Toutes fonctions niveau 2',
-                        '✓ Parrainage niveau 2',
-                        '✓ Bonus 5%',
-                        '✓ Support prioritaire'
-                    ]
-                ];
+                // echo '<pre>';
+                // var_dump($structure_commissions);
+                // echo '</pre>';
+                
                 ?>
-
-                <?php foreach ($structure_commissions as $niveau): ?>
-                    <?php
+                <?php foreach ($structure_commissions as $niveau):
                     $num = (int) $niveau['niveau'];
                     $prix = number_format($niveau['investissement'], 0, ',', ' ') . " Ar";
                     $isCurrent = ($num === $niveau_actuel);
                     $isUnlocked = ($num <= $niveau_actuel);
 
-                    // Styles par défaut
+                    // Styles
                     $borderClass = $isUnlocked ? 'border-green-200' : 'border-gray-200';
                     $bgCircle = $isUnlocked ? 'bg-green-100' : 'bg-gray-100';
                     $iconColor = $isUnlocked ? 'text-green-600' : 'text-gray-500';
-                    $statusBadge = '';
 
-                    // Badge selon état
-                    if ($num !== 4) { // pour tous sauf niveau 4
-                        if ($isUnlocked && !$isCurrent) {
-                            $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                                        <i class="bi bi-check-circle mr-1"></i>Débloqué
-                                    </span>';
-                        } elseif ($isCurrent) {
-                            $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                                        <i class="bi bi-check-circle-fill mr-1"></i>Actuel
-                                    </span>';
-                        } else {
-                            $statusBadge = '<button onclick="unlockLevel(' . $num . ')"
-                                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
-                                    <i class="bi bi-unlock mr-1"></i>Débloquer
-                                </button>';
-                        }
+
+                    // Badge
+                    if ($isCurrent) {
+                        $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium"><i class="bi bi-check-circle-fill mr-1"></i>Actuel</span>';
+                    } elseif ($isUnlocked) {
+                        $statusBadge = '<span class="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium"><i class="bi bi-check-circle mr-1"></i>Débloqué</span>';
+                    } else {
+                        $statusBadge = '<button onclick="unlockLevel(' . $num . ')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors"><i class="bi bi-unlock mr-1"></i>Débloquer</button>';
                     }
                     ?>
-
-                    <!-- Exception : Niveau 4 -->
-                    <?php if ($num === 4): ?>
-                        <div class="bg-white rounded-xl p-6 shadow-md border-2 border-yellow-300 relative">
+                    <div class="bg-white rounded-xl p-6 shadow-md border-2 <?= $borderClass ?> relative">
+                        <?php if ($num === 4): ?>
                             <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
                                 <span
                                     class="bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">NOUVEAU</span>
                             </div>
-                            <div class="text-center">
-                                <div class="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <i class="bi bi-star-fill text-yellow-600 text-2xl"></i>
-                                </div>
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Niveau 4</h3>
-                                <p class="text-yellow-600 font-bold text-lg mb-4"><?= $prix ?></p>
-                                <div class="space-y-2 text-sm text-gray-600 mb-6">
-                                    <p>✓ Toutes fonctions niveau 3</p>
-                                    <p>✓ Parrainage niveau 3</p>
-                                    <p>✓ Bonus 7%</p>
-                                    <p>✓ Retraits prioritaires</p>
-                                    <p>✓ Gestionnaire dédié</p>
-                                </div>
-                                <p class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                                    ⚡ Minage automatique activé
-                                </p>
+                        <?php endif; ?>
+
+                        <div class="text-center">
+                            <div
+                                class="<?= $bgCircle ?> w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="bi bi-star-fill <?= $iconColor ?> text-2xl"></i>
                             </div>
-                        </div>
-                    <?php else: ?>
-                        <!-- Niveaux 1 à 3 dynamiques -->
-                        <div class="bg-white rounded-xl p-6 shadow-md border-2 <?= $borderClass ?>">
-                            <div class="text-center">
-                                <div
-                                    class="<?= $bgCircle ?> w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <i class="bi bi-star-fill <?= $iconColor ?> text-2xl"></i>
-                                </div>
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Niveau <?= $num ?></h3>
-                                <p class="text-primary font-bold text-lg mb-4"><?= $prix ?></p>
-                                <div class="space-y-2 text-sm text-gray-600 mb-6">
-                                    <?php foreach ($avantages[$num] as $avantage): ?>
-                                        <p><?= $avantage ?></p>
-                                    <?php endforeach; ?>
-                                </div>
-                                <?= $statusBadge ?>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Niveau <?= $num ?></h3>
+                            <p class="text-primary font-bold text-lg mb-4"><?= $prix ?></p>
+                            <div class="space-y-2 text-sm text-gray-600 mb-6">
+                                <?php foreach ($niveau['avantages'] as $avantage): ?>
+                                    <p><?= $avantage ?></p>
+                                <?php endforeach; ?>
                             </div>
+                            <?= $statusBadge ?>
                         </div>
-                    <?php endif; ?>
+                    </div>
                 <?php endforeach; ?>
+
             </div>
 
 
@@ -1520,56 +1070,38 @@ require_once "../app/controller.php";
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                     Fonctionnalité</th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Niveau 1
-                                </th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Niveau 2
-                                </th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Niveau 3
-                                </th>
-                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Niveau 4
-                                </th>
+                                <?php for ($i = 1; $i <= 4; $i++): ?>
+                                    <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Niveau
+                                        <?= $i ?>
+                                    </th>
+                                <?php endfor; ?>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            <tr>
-                                <td class="px-4 py-4 font-medium text-gray-900">Dépôts/Retraits</td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-4 font-medium text-gray-900">Parrainage</td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-x-circle text-red-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-4 font-medium text-gray-900">Bonus parrainage</td>
-                                <td class="px-4 py-4 text-center text-gray-400">-</td>
-                                <td class="px-4 py-4 text-center text-green-600 font-medium">3%</td>
-                                <td class="px-4 py-4 text-center text-green-600 font-medium">5%</td>
-                                <td class="px-4 py-4 text-center text-green-600 font-medium">7%</td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-4 font-medium text-gray-900">Support prioritaire</td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-x-circle text-red-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-x-circle text-red-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                            </tr>
-                            <tr>
-                                <td class="px-4 py-4 font-medium text-gray-900">Gestionnaire dédié</td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-x-circle text-red-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-x-circle text-red-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-x-circle text-red-600"></i></td>
-                                <td class="px-4 py-4 text-center"><i class="bi bi-check-circle text-green-600"></i></td>
-                            </tr>
+                            <?php foreach ($features as $feature => $levels): ?>
+                                <tr>
+                                    <td class="px-4 py-4 font-medium text-gray-900"><?= $feature ?></td>
+                                    <?php for ($i = 1; $i <= 4; $i++): ?>
+                                        <td class="px-4 py-4 text-center">
+                                            <?php if (is_array($levels) && isset($levels[$i])): ?>
+                                                <!-- Cas bonus chiffré -->
+                                                <span class="text-green-600 font-medium"><?= $levels[$i] ?></span>
+                                            <?php elseif (is_array($levels) && in_array($i, $levels)): ?>
+                                                <!-- Fonctionnalité dispo -->
+                                                <i class="bi bi-check-circle text-green-600"></i>
+                                            <?php else: ?>
+                                                <!-- Fonctionnalité indispo -->
+                                                <i class="bi bi-x-circle text-red-600"></i>
+                                            <?php endif; ?>
+                                        </td>
+                                    <?php endfor; ?>
+                                </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
+
         </main>
     </div>
 
@@ -1759,54 +1291,10 @@ require_once "../app/controller.php";
 
         // Gestion du formulaire de dépôt
         document.addEventListener('DOMContentLoaded', function () {
-            // Formulaire de dépôt
-            const depositForm = document.getElementById('depositForm');
-            if (depositForm) {
-                const paymentMethods = depositForm.querySelectorAll('input[name="paymentMethod"]');
-                const mobileDetails = document.getElementById('mobileMoneyDetails');
-                const bankDetails = document.getElementById('bankDetails');
-
-                paymentMethods.forEach(method => {
-                    method.addEventListener('change', function () {
-                        if (this.value === 'mobile') {
-                            mobileDetails.classList.remove('hidden');
-                            bankDetails.classList.add('hidden');
-                        } else if (this.value === 'bank') {
-                            bankDetails.classList.remove('hidden');
-                            mobileDetails.classList.add('hidden');
-                        }
-                    });
-                });
-
-                depositForm.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const amount = document.getElementById('depositAmount').value;
-                    const transactionId = document.getElementById('transactionId').value;
-                    const proofFile = document.getElementById('proofUpload').files[0];
-
-                    if (amount && amount >= 1000 && transactionId && proofFile) {
-                        alert(
-                            `Demande de dépôt de ${parseInt(amount).toLocaleString()} Ar envoyée avec succès !\nID transaction: ${transactionId}\nPreuve jointe: ${proofFile.name}`
-                        );
-                        this.reset();
-                        mobileDetails.classList.add('hidden');
-                        bankDetails.classList.add('hidden');
-                        resetFileUpload();
-                    } else {
-                        let errorMsg = 'Veuillez compléter tous les champs requis:\n';
-                        if (!amount || amount < 1000) errorMsg += '- Montant valide (minimum 1 000 Ar)\n';
-                        if (!transactionId) errorMsg += '- ID de transaction\n';
-                        if (!proofFile) errorMsg += '- Preuve de dépôt (image)';
-                        alert(errorMsg);
-                    }
-                });
-            }
-
-            // Formulaire de retrait
             const form = document.getElementById('withdrawForm');
 
             form.addEventListener('submit', function (e) {
-               alert()
+                alert();
                 e.preventDefault();
 
                 const amount = document.getElementById('withdrawAmount').value;
@@ -1823,18 +1311,23 @@ require_once "../app/controller.php";
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        montant: amount,
-                        methode: method
+                        amount: amount,   // 👈 même clé que PHP
+                        method: method    // 👈 même clé que PHP
                     })
                 })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Mise à jour du solde
-                            document.getElementById('userBalance').textContent = data.newBalance + ' Ar';
+                            // Mise à jour du solde si présent
+                            if (document.getElementById('userBalance')) {
+                                document.getElementById('userBalance').textContent = data.newBalance + ' Ar';
+                            }
+
+                            alert(data.message);
 
                             // Réinitialiser le formulaire
                             form.reset();
+                            document.getElementById('withdrawSummary').classList.add('hidden');
                         } else {
                             alert(data.message || "Erreur lors du retrait");
                         }
@@ -1897,7 +1390,7 @@ require_once "../app/controller.php";
         // Fonctions pour le dépôt rapide
         function updateUSSDCode() {
             const amount = document.getElementById('quickDepositAmount').value || '1000';
-            const ussdCode = `#144*1*1*032274356*0322743567*${amount}#`;
+            const ussdCode = `#144*1*1*0329375154*0329375154*${amount}*2#`;
             document.getElementById('ussdCode').textContent = ussdCode;
         }
 
