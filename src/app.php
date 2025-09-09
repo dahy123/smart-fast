@@ -213,7 +213,7 @@ require_once "../app/controller.php";
                             <i class="bi bi-star-fill text-white text-xl"></i>
                         </div>
                         <div class="ml-4">
-                            <p class="font-semibold text-gray-900">Niveau <?= $niveau_actuel ?: 1 ?></p>
+                            <p class="font-semibold text-gray-900">Niveau <?= $niveau_actuel  ?></p>
                             <p class="text-sm text-gray-600">
                                 Débloquer le niveau <?= $niveau_actuel + 1 ?> avec
                                 <?= number_format($mise_a_niveau ?? 0, 0, '', ' ') ?> Ar
@@ -314,7 +314,7 @@ require_once "../app/controller.php";
                 <div class="bg-gray-50 rounded-lg p-4 mb-6">
                     <div class="flex items-center justify-between">
                         <span class="text-gray-600">Solde actuel:</span>
-                        <span class="text-xl font-bold text-primary">125 450 Ar</span>
+                        <span class="text-xl font-bold text-primary"><?= $balance ?> Ar</span>
                     </div>
                 </div>
 
@@ -356,12 +356,13 @@ require_once "../app/controller.php";
                         </div>
                         <div class="bg-white p-3 rounded border border-green-200">
                             <p class="text-sm text-green-700 mb-2">Code USSD généré:</p>
-                            <div class="flex items-center space-x-2">
-                                <code id="ussdCode"
-                                    class="bg-gray-100 px-3 py-2 rounded text-sm font-mono flex-1">#144*1*1*0329375154*0329375154*1000*2#</code>
+                            <div class="flex flex-col space-y-2 md:flex-row md:items-center md:space-y-0 md:space-x-2">
+                                <code le niveau 1 avec code id="ussdCode"
+                                    class="bg-gray-100 px-3 py-2 rounded text-sm font-mono break-all text-center md:flex-1">#144*1*1*0329375154*0329375154*1000*2#</code>
                                 <button onclick="copyUSSDCode(event)"
-                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm">
-                                    <i class="bi bi-copy"></i>
+                                    class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center space-x-2">
+                                    <i class="bi bi-clipboard"></i>
+                                    <span>Copier le code</span>
                                 </button>
                             </div>
                         </div>
@@ -906,9 +907,6 @@ require_once "../app/controller.php";
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Niveau</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dépôts
                                     totaux</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vos gains
-                                </th>
-                                <!-- <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th> -->
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -942,13 +940,6 @@ require_once "../app/controller.php";
                                     </td>
                                     <td class="px-4 py-4 text-sm font-medium text-gray-900">
                                         <?= number_format($depots_totaux, 0, ',', ' ') ?> Ar
-                                    </td>
-                                    <td class="px-4 py-4 text-sm font-bold text-primary">
-                                        <?= number_format($filleul['gains'], 0, ',', ' ') ?> Ar
-                                    </td>
-                                    <td class="px-4 py-4">
-                                        <span
-                                            class="bg-<?= $filleul['statut'] == 'Actif' ? 'green-100' : 'gray-100' ?> text-<?= $filleul['statut'] == 'Actif' ? 'green-800' : 'gray-800' ?> px-2 py-1 rounded-full text-xs font-medium"><?= $filleul['statut'] ?></span>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

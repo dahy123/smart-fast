@@ -5,7 +5,12 @@ class Database
     private static $host = "localhost";
     private static $db = "smart_fast";
     private static $user = "root";
-    private static $password = "1234";
+    private static $password = "";
+
+    // private static $host = 'sql111.infinityfree.com'; // Database host
+    // private static $db = 'if0_39039983_smart_fast'; // Database name if0_39039983_smart
+    // private static $user = 'if0_39039983'; // Database username
+    // private static $password = 'zim2c7UzVzti9ZY'; // Database password
 
     // Constantes pour les rôles et statuts
     const ROLE_ADMIN = 'admin';
@@ -55,8 +60,9 @@ class Database
 
         $tables = [
             // utilisateurs
-            "CREATE TABLE IF NOT EXISTS utilisateurs (
+           "CREATE TABLE IF NOT EXISTS utilisateurs (
                 id INT AUTO_INCREMENT PRIMARY KEY,
+                code_utilisateur VARCHAR(20) UNIQUE,
                 nom VARCHAR(100),
                 prenom VARCHAR(100),
                 telephone VARCHAR(20) UNIQUE,
@@ -139,14 +145,39 @@ class Database
         $stmt = $pdo->query("SELECT COUNT(*) FROM utilisateurs WHERE telephone = '0329375154'");
         if ($stmt->fetchColumn() == 0) {
             $hash = password_hash('1234', PASSWORD_DEFAULT);
-            $stmtInsert = $pdo->prepare("INSERT INTO utilisateurs (nom, prenom, telephone, mot_de_passe, role)
-                                         VALUES ('Dahy', 'Oldon', '0329375154', :hash, :role)");
-            $stmtInsert->execute(['hash' => $hash, 'role' => self::ROLE_ADMIN]);
+
+            // Génération du code utilisateur
+            $code = self::generer_code_utilisateur($pdo, "Oldon", "Dahy");
+
+            $stmtInsert = $pdo->prepare("INSERT INTO utilisateurs (code_utilisateur, nom, prenom, telephone, mot_de_passe, role)
+                                     VALUES (:code, 'Dahy', 'Oldon', '0329375154', :hash, :role)");
+            $stmtInsert->execute([
+                'code' => $code,
+                'hash' => $hash,
+                'role' => self::ROLE_ADMIN
+            ]);
 
             $adminId = $pdo->lastInsertId();
             $pdo->prepare("INSERT INTO balances (utilisateur_id, total) VALUES (?, 0)")->execute([$adminId]);
         }
     }
+    // Génération du code utilisateur
+    private static function generer_code_utilisateur($pdo, $prenom, $nom)
+    {
+        // Initiales
+        $initiales = strtoupper(substr($prenom, 0, 1) . substr($nom, 0, 1));
+
+        // Compter combien d’utilisateurs existent déjà
+        $stmt = $pdo->query("SELECT COUNT(*) FROM utilisateurs");
+        $numero = $stmt->fetchColumn() + 1;
+
+        // Formater en 3 chiffres
+        $numeroFormatte = str_pad($numero, 3, "0", STR_PAD_LEFT);
+
+        // Construire le code final
+        return $initiales . "-SF" . $numeroFormatte;
+    }
+
 
     // Insertion des niveaux par défaut
     private static function insert_default_niveaux($pdo)

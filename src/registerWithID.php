@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 
 $pdo = Database::pdo();
 
-// 🔹 Normaliser le téléphone
+// 🔹 Fonction de normalisation du téléphone
 function normalize_phone($telephone) {
     $telephone = preg_replace('/\s+/', '', $telephone);
     if (strpos($telephone, '+261') === 0) {
@@ -17,35 +17,22 @@ function normalize_phone($telephone) {
     return $telephone;
 }
 
-// 🔹 Générer un code utilisateur unique (AM-SF002)
-function generate_user_code($prenom, $nom, $pdo) {
-    $initials = strtoupper(substr($prenom, 0, 1) . substr($nom, 0, 1));
-    
-    // Compter combien d’utilisateurs ont déjà ces initiales
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM utilisateurs WHERE code_utilisateur LIKE ?");
-    $stmt->execute([$initials . "-SF%"]);
-    $count = $stmt->fetchColumn() + 1;
-
-    // Exemple : AM-SF002
-    return sprintf("%s-SF%03d", $initials, $count);
-}
-
-//  Vérification de la méthode
+// 🔹 Vérification de la méthode
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Méthode non autorisée.']);
     exit;
 }
 
-//  Récupération des données
+// 🔹 Récupération des données
 $nom = trim($_POST['nom'] ?? '');
 $prenom = trim($_POST['prenom'] ?? '');
 $telephone = normalize_phone(trim($_POST['telephone'] ?? ''));
 $mot_de_passe = $_POST['mot_de_passe'] ?? '';
 $confirm_mot_de_passe = $_POST['confirm_mot_de_passe'] ?? '';
-$parrain_code = trim($_POST['parrain_code'] ?? '');
+$parrain_id = isset($_POST['parrain_id']) ? intval($_POST['parrain_id']) : null;
 
-//  Validation des champs
-if (!$nom || !$prenom || !$telephone || !$mot_de_passe || !$confirm_mot_de_passe || !$parrain_code) {
+// 🔹 Validation des champs
+if (!$nom || !$prenom || !$telephone || !$mot_de_passe || !$confirm_mot_de_passe || !$parrain_id) {
     echo json_encode(['success' => false, 'message' => 'Tous les champs sont obligatoires.']);
     exit;
 }
@@ -55,7 +42,7 @@ if ($mot_de_passe !== $confirm_mot_de_passe) {
     exit;
 }
 
-//  Vérification du téléphone
+// 🔹 Vérification du téléphone
 $stmt = $pdo->prepare("SELECT id FROM utilisateurs WHERE telephone = ?");
 $stmt->execute([$telephone]);
 if ($stmt->fetch()) {
@@ -63,17 +50,13 @@ if ($stmt->fetch()) {
     exit;
 }
 
-//  Vérification du parrain avec son code
-$stmt = $pdo->prepare("SELECT id FROM utilisateurs WHERE code_utilisateur = ?");
-$stmt->execute([$parrain_code]);
-$parrain = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$parrain) {
-    echo json_encode(['success' => false, 'message' => 'Code parrain invalide.']);
+// 🔹 Vérification du parrain
+$stmt = $pdo->prepare("SELECT id FROM utilisateurs WHERE id = ?");
+$stmt->execute([$parrain_id]);
+if (!$stmt->fetch()) {
+    echo json_encode(['success' => false, 'message' => 'ID de parrain invalide.']);
     exit;
 }
-
-$parrain_id = $parrain['id'];
 
 // 🔹 Limite de filleuls
 $stmt = $pdo->prepare("SELECT COUNT(*) FROM utilisateurs WHERE parrain_id = ?");
@@ -86,33 +69,26 @@ if ($stmt->fetchColumn() >= 2) {
 // 🔹 Hachage du mot de passe
 $hash = password_hash($mot_de_passe, PASSWORD_DEFAULT);
 
-// 🔹 Générer code utilisateur unique
-$code_utilisateur = generate_user_code($prenom, $nom, $pdo);
-
 try {
+    // 🔄 Transaction
     $pdo->beginTransaction();
 
-    // 🔹 Insertion utilisateur avec code_utilisateur
+    // 🔹 Insertion utilisateur
     $stmt = $pdo->prepare("
-        INSERT INTO utilisateurs (nom, prenom, telephone, mot_de_passe, parrain_id, code_utilisateur, date_inscription)
-        VALUES (?, ?, ?, ?, ?, ?, NOW())
+        INSERT INTO utilisateurs (nom, prenom, telephone, mot_de_passe, parrain_id, date_inscription)
+        VALUES (?, ?, ?, ?, ?, NOW())
     ");
-    $stmt->execute([$nom, $prenom, $telephone, $hash, $parrain_id, $code_utilisateur]);
+    $stmt->execute([$nom, $prenom, $telephone, $hash, $parrain_id]);
 
     $userId = $pdo->lastInsertId();
 
-    // 🔹 Créer la balance
+    // 🔹 Création de la balance
     $stmt = $pdo->prepare("INSERT INTO balances (utilisateur_id, total) VALUES (?, 0)");
     $stmt->execute([$userId]);
 
     $pdo->commit();
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Inscription réussie.',
-        'user_id' => $userId,
-        'code_utilisateur' => $code_utilisateur
-    ]);
+    echo json_encode(['success' => true, 'message' => 'Inscription réussie.', 'user_id' => $userId]);
 } catch (Exception $e) {
     $pdo->rollBack();
     echo json_encode(['success' => false, 'message' => 'Erreur lors de l\'inscription.']);

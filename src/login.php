@@ -200,7 +200,7 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                <i class="bi bi-people mr-2"></i>ID Parrain <span class="text-red-500">*</span>
+                                <i class="bi bi-people mr-2"></i>Code Parrain <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="registerSponsorId" required
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
@@ -407,7 +407,8 @@
                         const response = await fetch('validate_sponsor_id.php', {
                             method: 'POST',
                             body: new URLSearchParams({
-                                parrain_id: sponsorId
+                                // parrain_id: sponsorId
+                                parrain_code: sponsorId 
                             })
                         });
 
@@ -550,7 +551,8 @@
                         telephone: phone,
                         mot_de_passe: password,
                         confirm_mot_de_passe: confirmPassword,
-                        parrain_id: sponsorId
+                        // parrain_id: sponsorId
+                        parrain_code: sponsorId
                     })
                 });
 
@@ -560,7 +562,7 @@
                     // alert(`Inscription réussie ! Bienvenue ${firstName} ${lastName} 🎉\nVotre ID: ${result.user_id}`);
                     Swal.fire({
                         title: '🎉 Inscription réussie !',
-                        html: `Bienvenue <b>${firstName} ${lastName}</b><br>Votre ID : <b>${result.user_id}</b>`,
+                        html: `Bienvenue <b>${firstName} ${lastName}</b><br>Votre code parrain : <b>${result.code_utilisateur}</b>`,
                         icon: 'success',
                         confirmButtonText: 'OK',
                         confirmButtonColor: '#0ED584', // Vert

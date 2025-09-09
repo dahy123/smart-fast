@@ -197,9 +197,9 @@ if ($pdo) {
     $commissions_gagnees = $commissions_directes + $commissions_indirectes;
 
     // Lien de parrainage
-    $lien_parrainage = "https://smart-mg.is-best.net/src/auth.php";
-    $lien_admin = "https://smart-mg.is-best.net/src/admin/dashboard.php";
-    $lien_moderator = "https://smart-mg.is-best.net/src/admin/depot.php";
+    $lien_parrainage = "https://smart-fast.is-best.net/src/auth.php";
+    $lien_admin = "https://smart-fast.is-best.net/src/admin/dashboard.php";
+    $lien_moderator = "https://smart-fast.is-best.net/src/admin/depot.php";
 
     // Arbre de parrainage
     function getReferralTree($pdo, $user_id, $niveau = 1, $max_niveau = 5)
@@ -247,7 +247,7 @@ if ($pdo) {
     $niveau_actuel = (int) $stmt->fetchColumn();
 
     // Niveau suivant
-    $stmt = $pdo->prepare("SELECT mise_a_niveau FROM niveaux WHERE niveau = ?");
+    $stmt = $pdo->prepare("SELECT investissement FROM niveaux WHERE niveau = ?");
     $stmt->execute([$niveau_actuel + 1]);
     $mise_a_niveau = (int) $stmt->fetchColumn() ?: 0; // 0 si non trouvé
 
